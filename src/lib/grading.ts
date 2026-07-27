@@ -13,18 +13,19 @@ export type Grade = keyof typeof GRADE_POINTS;
 export interface Course {
   name: string;
   credits: number;
-  grade: Grade;
+  grade: Grade | 'N/A' | string;
 }
 
 export function calculateSGPA(courses: Course[]): number {
-  if (courses.length === 0) return 0;
-
   let totalCredits = 0;
   let totalWeightedPoints = 0;
 
   for (const course of courses) {
-    totalCredits += course.credits;
-    totalWeightedPoints += course.credits * GRADE_POINTS[course.grade];
+    if (course.grade in GRADE_POINTS) {
+      const validGrade = course.grade as Grade;
+      totalCredits += course.credits;
+      totalWeightedPoints += course.credits * GRADE_POINTS[validGrade];
+    }
   }
 
   if (totalCredits === 0) return 0;
@@ -33,14 +34,14 @@ export function calculateSGPA(courses: Course[]): number {
 }
 
 export function calculateCGPA(semesters: { sgpa: number; totalCredits: number }[]): number {
-  if (semesters.length === 0) return 0;
-
   let totalCredits = 0;
   let totalWeightedSGPA = 0;
 
   for (const semester of semesters) {
-    totalCredits += semester.totalCredits;
-    totalWeightedSGPA += semester.sgpa * semester.totalCredits;
+    if (semester.sgpa > 0 && semester.totalCredits > 0) {
+      totalCredits += semester.totalCredits;
+      totalWeightedSGPA += semester.sgpa * semester.totalCredits;
+    }
   }
 
   if (totalCredits === 0) return 0;

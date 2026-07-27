@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect, useMemo, KeyboardEvent } from 'react'
-import { COURSES_DATA, BRANCHES, CourseDefinition } from '@/data/coursesData'
+import { BRANCHES, CourseDefinition, getCurriculumForBranch, BRANCH_CURRICULA } from '@/data/coursesData'
 
 interface CourseComboboxProps {
   selectedCourse: CourseDefinition | null
@@ -30,7 +30,6 @@ export default function CourseCombobox({
   const inputRef = useRef<HTMLInputElement>(null)
   const listRef = useRef<HTMLUListElement>(null)
 
-  // Normalize existing course names to check for duplicates
   const existingNamesLower = useMemo(
     () => existingCourseNames.map((name) => name.toLowerCase().trim()),
     [existingCourseNames]
@@ -38,16 +37,23 @@ export default function CourseCombobox({
 
   // Filter courses based on branch, toggle, and search query
   const filteredCourses = useMemo(() => {
-    let list = COURSES_DATA
+    let list: CourseDefinition[] = []
 
-    // 1. Branch filter: if not showing all courses, match selected branch OR general science/HSS
-    if (!showAllCourses) {
-      list = list.filter(
-        (c) => c.branch === selectedBranch || c.branch === 'GEN'
-      )
+    if (showAllCourses) {
+      // Aggregate courses from all branches
+      const allBranches = Object.keys(BRANCH_CURRICULA)
+      const map = new Map<string, CourseDefinition>()
+      allBranches.forEach((b) => {
+        getCurriculumForBranch(b).forEach((c) => {
+          map.set(`${c.code}-${c.name}`, c)
+        })
+      })
+      list = Array.from(map.values())
+    } else {
+      list = getCurriculumForBranch(selectedBranch)
     }
 
-    // 2. Search query filter
+    // Search query filter
     const query = searchQuery.trim().toLowerCase()
     if (query) {
       list = list.filter(
@@ -60,12 +66,10 @@ export default function CourseCombobox({
     return list
   }, [selectedBranch, showAllCourses, searchQuery])
 
-  // Reset active index when filtered courses change
   useEffect(() => {
     setActiveIndex(0)
   }, [filteredCourses])
 
-  // Scroll active item into view when navigating via keyboard
   useEffect(() => {
     if (isOpen && listRef.current) {
       const activeEl = listRef.current.children[activeIndex] as HTMLElement
@@ -75,7 +79,6 @@ export default function CourseCombobox({
     }
   }, [activeIndex, isOpen])
 
-  // Close dropdown on outside click
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (
@@ -89,7 +92,6 @@ export default function CourseCombobox({
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  // Handle keyboard navigation inside search input
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (!isOpen) {
       if (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'Enter') {
@@ -142,7 +144,6 @@ export default function CourseCombobox({
 
   return (
     <div ref={comboboxRef} className="space-y-2">
-      {/* Branch Selector Header Bar */}
       <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
         <div className="flex items-center gap-2">
           <label htmlFor="branch-select" className="font-medium text-slate-400">
@@ -156,7 +157,7 @@ export default function CourseCombobox({
           >
             {BRANCHES.map((b) => (
               <option key={b.id} value={b.id}>
-                {b.name} ({b.id})
+                {b.name} ({b.code})
               </option>
             ))}
           </select>
@@ -173,7 +174,6 @@ export default function CourseCombobox({
         </label>
       </div>
 
-      {/* Combobox Search Field & Popover Anchor */}
       <div className="relative">
         <div className="relative flex items-center">
           <input
@@ -200,7 +200,6 @@ export default function CourseCombobox({
             className="w-full rounded-lg border border-slate-700 bg-slate-800 py-2.5 pl-3 pr-10 text-sm text-white placeholder-slate-400 focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
           />
 
-          {/* Action Icon: Clear or Chevron */}
           <div className="absolute right-2.5 flex items-center gap-1">
             {selectedCourse || searchQuery ? (
               <button
@@ -227,7 +226,6 @@ export default function CourseCombobox({
           </div>
         </div>
 
-        {/* Dropdown Popover Panel */}
         {isOpen && (
           <div className="absolute z-50 mt-1 max-h-60 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 shadow-2xl backdrop-blur-md">
             <ul
@@ -278,7 +276,7 @@ export default function CourseCombobox({
                         </div>
                         {item.category && (
                           <span className="text-[10px] text-slate-400">
-                            Category: {item.category} • Branch: {item.branch}
+                            Category: {item.category} • Branch: {item.branch} • Sem {item.semester}
                           </span>
                         )}
                       </div>

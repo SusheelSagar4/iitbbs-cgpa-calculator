@@ -1,21 +1,8 @@
-import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
-import LogoutButton from '@/components/LogoutButton'
-
-export default async function DashboardLayout({
+export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const supabase = createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    redirect('/login')
-  }
-
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100">
       <header className="sticky top-0 z-10 border-b border-slate-800/80 bg-slate-900/60 backdrop-blur-md">
@@ -28,7 +15,6 @@ export default async function DashboardLayout({
               IIT Bhubaneswar CGPA Calculator
             </h1>
           </div>
-          <LogoutButton />
         </div>
       </header>
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
