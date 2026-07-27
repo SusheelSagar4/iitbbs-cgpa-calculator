@@ -96,14 +96,12 @@ export default function CurriculumDashboard({
         grade: c.grade,
       }))
 
-      // Completed courses (grade is EX, A, B, C, D, P)
       const completedCourses = sem.courses.filter(
         (c) => ['EX', 'A', 'B', 'C', 'D', 'P'].includes(c.grade)
       )
       const earnedCredits = completedCourses.reduce((sum, c) => sum + c.credits, 0)
       const totalSemesterCredits = sem.courses.reduce((sum, c) => sum + c.credits, 0)
 
-      // Calculate SGPA based on graded courses
       const sgpa = calculateSGPA(courses)
 
       return {
@@ -157,47 +155,48 @@ export default function CurriculumDashboard({
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-10">
       {/* Executive Overall CGPA & Academic Progress Card */}
-      <div className="relative overflow-hidden rounded-2xl border border-slate-800 bg-gradient-to-br from-slate-900 via-slate-900/90 to-teal-950/40 p-6 sm:p-8 shadow-xl">
+      <div className="relative overflow-hidden rounded-3xl glass-card p-6 sm:p-10 shadow-2xl space-y-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold uppercase tracking-wider text-teal-400">
+              <span className="text-xs font-black uppercase tracking-wider text-cyan-400">
                 Cumulative Grade Point Average
               </span>
-              <span className="rounded bg-teal-500/10 px-2 py-0.5 text-[10px] font-bold text-teal-400 border border-teal-500/20">
+              <span className="rounded-full bg-cyan-500/10 border border-cyan-400/30 px-3 py-0.5 text-[10px] font-extrabold text-cyan-300 backdrop-blur-md">
                 Branch: {branchId}
               </span>
             </div>
-            <div className="mt-2 flex items-baseline gap-2">
-              <span className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
+
+            <div className="mt-3 flex items-baseline gap-3">
+              <span className="text-5xl sm:text-6xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-cyan-300">
                 {overallMetrics.overallCGPA > 0 ? overallMetrics.overallCGPA.toFixed(2) : 'N/A'}
               </span>
-              <span className="text-base font-medium text-slate-400 sm:text-lg">
+              <span className="text-base sm:text-xl font-bold text-slate-400">
                 / 10.00
               </span>
             </div>
           </div>
 
           {/* Quick Metrics Stats */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 border-t md:border-t-0 md:border-l border-slate-800 pt-4 md:pt-0 md:pl-6 text-slate-300">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 border-t md:border-t-0 md:border-l border-white/10 pt-4 md:pt-0 md:pl-8 text-slate-300">
             <div>
-              <span className="text-xs text-slate-400">Earned Credits</span>
-              <p className="text-lg font-bold text-white">
-                {overallMetrics.totalEarnedCredits} <span className="text-xs text-slate-500">/ {overallMetrics.totalCurriculumCredits}</span>
+              <span className="text-xs font-semibold text-slate-400 block mb-1">Earned Credits</span>
+              <p className="text-xl font-black text-white">
+                {overallMetrics.totalEarnedCredits} <span className="text-xs font-normal text-slate-400">/ {overallMetrics.totalCurriculumCredits}</span>
               </p>
             </div>
             <div>
-              <span className="text-xs text-slate-400">Courses Completed</span>
-              <p className="text-lg font-bold text-white">
-                {overallMetrics.totalCompletedCourses} <span className="text-xs text-slate-500">/ {overallMetrics.totalCoursesCount}</span>
+              <span className="text-xs font-semibold text-slate-400 block mb-1">Courses Completed</span>
+              <p className="text-xl font-black text-white">
+                {overallMetrics.totalCompletedCourses} <span className="text-xs font-normal text-slate-400">/ {overallMetrics.totalCoursesCount}</span>
               </p>
             </div>
             <div className="col-span-2 sm:col-span-1">
               <button
                 onClick={handleResetCurriculum}
-                className="inline-flex items-center gap-1 text-xs text-slate-400 hover:text-red-400 transition-colors mt-2 sm:mt-0"
+                className="inline-flex items-center gap-1.5 glass-button-secondary rounded-xl px-3 py-1.5 text-xs font-bold text-slate-300 hover:text-red-400 transition-colors mt-2 sm:mt-0"
               >
                 <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -208,15 +207,15 @@ export default function CurriculumDashboard({
           </div>
         </div>
 
-        {/* Global Progress Bar */}
-        <div className="mt-6 space-y-1.5">
-          <div className="flex justify-between text-xs text-slate-400">
+        {/* Global Multi-stop Progress Bar */}
+        <div className="space-y-2">
+          <div className="flex justify-between text-xs font-semibold text-slate-400">
             <span>Overall Curriculum Completion</span>
-            <span className="font-semibold text-teal-400">{overallMetrics.progressPercentage}%</span>
+            <span className="text-cyan-400 font-extrabold">{overallMetrics.progressPercentage}%</span>
           </div>
-          <div className="h-2 w-full overflow-hidden rounded-full bg-slate-800">
+          <div className="h-3 w-full overflow-hidden rounded-full bg-slate-950/80 p-0.5 border border-white/5">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-teal-500 to-emerald-400 transition-all duration-500"
+              className="h-full rounded-full bg-gradient-to-r from-cyan-500 via-blue-500 to-violet-500 shadow-lg shadow-cyan-500/20 transition-all duration-500"
               style={{ width: `${overallMetrics.progressPercentage}%` }}
             />
           </div>
@@ -225,7 +224,10 @@ export default function CurriculumDashboard({
 
       {/* 8 Semesters Curriculum Grid */}
       <div className="space-y-6">
-        <h3 className="text-xl font-bold text-white">Curriculum Semesters</h3>
+        <div className="flex items-center justify-between">
+          <h3 className="text-2xl font-black text-white tracking-tight">Curriculum Semesters</h3>
+          <span className="text-xs text-slate-400 font-medium">8 Semesters Pre-loaded</span>
+        </div>
 
         <div className="grid grid-cols-1 gap-6">
           {processedSemesters.map((sem) => {
@@ -235,45 +237,45 @@ export default function CurriculumDashboard({
             return (
               <div
                 key={sem.id}
-                className="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 sm:p-6 shadow-sm space-y-4"
+                className="rounded-3xl glass-card glass-card-hover p-6 sm:p-8 space-y-6"
               >
                 {/* Semester Header, SGPA Badge, & Add Course Button */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800/80 pb-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-5">
                   <div>
                     <div className="flex items-center gap-3">
-                      <h4 className="text-lg font-bold text-white">
+                      <h4 className="text-xl font-black text-white">
                         Semester {sem.semester_number}
                       </h4>
-                      <span className="rounded-md border border-teal-500/20 bg-teal-500/10 px-2.5 py-0.5 text-xs font-semibold text-teal-400">
+                      <span className="rounded-xl border border-cyan-400/30 bg-cyan-500/10 px-3 py-1 text-xs font-extrabold text-cyan-300 backdrop-blur-md">
                         SGPA: {sem.sgpa > 0 ? sem.sgpa.toFixed(2) : 'N/A'}
                       </span>
                     </div>
-                    <p className="mt-0.5 text-xs text-slate-400">
+                    <p className="mt-1 text-xs text-slate-400 font-medium">
                       {sem.completedCount} of {sem.totalCount} Courses Completed • {sem.earnedCredits} / {sem.totalSemesterCredits} Credits Earned
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-4">
                     {/* Add Course Button */}
                     <button
                       onClick={() => setActiveModalSemNumber(sem.semester_number)}
-                      className="inline-flex items-center gap-1.5 rounded-lg border border-teal-500/30 bg-teal-500/10 px-3 py-1.5 text-xs font-semibold text-teal-400 hover:bg-teal-500/20 transition-all focus:outline-none"
+                      className="glass-button-secondary rounded-xl px-4 py-2 text-xs font-extrabold text-cyan-300 flex items-center gap-1.5"
                     >
-                      <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
                       </svg>
                       + Add Course
                     </button>
 
                     {/* Semester Progress Bar */}
-                    <div className="hidden sm:block w-36 space-y-1">
-                      <div className="flex justify-between text-[11px] font-medium text-slate-400">
+                    <div className="hidden sm:block w-40 space-y-1.5">
+                      <div className="flex justify-between text-[11px] font-bold text-slate-400">
                         <span>Progress</span>
-                        <span>{semProgress}%</span>
+                        <span className="text-cyan-400">{semProgress}%</span>
                       </div>
-                      <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-800">
+                      <div className="h-2 w-full overflow-hidden rounded-full bg-slate-950/80 border border-white/5">
                         <div
-                          className="h-full rounded-full bg-teal-500 transition-all duration-300"
+                          className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-emerald-400 transition-all duration-300"
                           style={{ width: `${semProgress}%` }}
                         />
                       </div>
@@ -284,61 +286,62 @@ export default function CurriculumDashboard({
                 {/* Course List Table */}
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-sm text-slate-300">
-                    <thead className="text-[11px] uppercase font-semibold text-slate-500">
+                    <thead className="text-[11px] uppercase font-bold text-slate-500 border-b border-white/5">
                       <tr>
-                        <th scope="col" className="py-2 px-3">Course Code & Name</th>
-                        <th scope="col" className="py-2 px-3">Type</th>
-                        <th scope="col" className="py-2 px-3">Credits</th>
-                        <th scope="col" className="py-2 px-3">Status</th>
-                        <th scope="col" className="py-2 px-3 text-right">Grade Selector</th>
-                        <th scope="col" className="py-2 px-2 text-right">Action</th>
+                        <th scope="col" className="py-3 px-4">Course Code & Name</th>
+                        <th scope="col" className="py-3 px-3">Type</th>
+                        <th scope="col" className="py-3 px-3">Credits</th>
+                        <th scope="col" className="py-3 px-3">Status</th>
+                        <th scope="col" className="py-3 px-4 text-right">Grade Selector</th>
+                        <th scope="col" className="py-3 px-2 text-right">Action</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-800/60">
+                    <tbody className="divide-y divide-white/5">
                       {sem.courses.map((course) => {
                         const isCompleted = ['EX', 'A', 'B', 'C', 'D', 'P'].includes(course.grade)
                         const isFailed = course.grade === 'F'
 
                         return (
-                          <tr key={course.id} className="hover:bg-slate-800/30 transition-colors">
-                            <td className="py-3 px-3">
-                              <span className="font-medium text-white block">{course.name}</span>
+                          <tr key={course.id} className="hover:bg-white/[0.03] transition-colors rounded-xl">
+                            <td className="py-3.5 px-4 font-semibold text-white">
+                              {course.name}
                             </td>
 
                             {/* Type Badge: Official vs Custom */}
-                            <td className="py-3 px-3">
+                            <td className="py-3.5 px-3">
                               {course.isCustom ? (
-                                <span className="inline-flex items-center gap-1 rounded-md bg-indigo-950/60 border border-indigo-800/40 px-2 py-0.5 text-[10px] font-semibold text-indigo-300">
+                                <span className="inline-flex items-center gap-1 rounded-lg bg-indigo-950/60 border border-indigo-500/30 px-2.5 py-0.5 text-[10px] font-bold text-indigo-300 shadow-sm">
                                   ✏ Custom
                                 </span>
                               ) : (
-                                <span className="inline-flex items-center gap-1 rounded-md bg-slate-800/60 border border-slate-700/40 px-2 py-0.5 text-[10px] font-medium text-slate-400">
+                                <span className="inline-flex items-center gap-1 rounded-lg bg-slate-800/60 border border-white/10 px-2.5 py-0.5 text-[10px] font-medium text-slate-400">
                                   ✔ Curriculum
                                 </span>
                               )}
                             </td>
 
-                            <td className="py-3 px-3 text-xs font-semibold text-slate-400">
+                            <td className="py-3.5 px-3 text-xs font-bold text-slate-400">
                               {course.credits} Cr
                             </td>
-                            <td className="py-3 px-3">
+
+                            <td className="py-3.5 px-3">
                               {isCompleted ? (
-                                <span className="inline-flex items-center rounded-md bg-teal-950/60 border border-teal-800/40 px-2 py-0.5 text-[10px] font-semibold text-teal-400">
+                                <span className="inline-flex items-center rounded-lg bg-teal-950/60 border border-teal-500/30 px-2.5 py-0.5 text-[10px] font-extrabold text-teal-300 shadow-sm">
                                   Completed
                                 </span>
                               ) : isFailed ? (
-                                <span className="inline-flex items-center rounded-md bg-red-950/60 border border-red-800/40 px-2 py-0.5 text-[10px] font-semibold text-red-400">
+                                <span className="inline-flex items-center rounded-lg bg-red-950/60 border border-red-500/30 px-2.5 py-0.5 text-[10px] font-extrabold text-red-300 shadow-sm">
                                   Failed
                                 </span>
                               ) : (
-                                <span className="inline-flex items-center rounded-md bg-slate-800/60 border border-slate-700/40 px-2 py-0.5 text-[10px] font-medium text-slate-400">
+                                <span className="inline-flex items-center rounded-lg bg-slate-900/60 border border-white/10 px-2.5 py-0.5 text-[10px] font-medium text-slate-400">
                                   Not Started
                                 </span>
                               )}
                             </td>
 
                             {/* Grade Selector */}
-                            <td className="py-3 px-3 text-right">
+                            <td className="py-3.5 px-4 text-right">
                               <GradeSelector
                                 courseId={course.id}
                                 currentGrade={course.grade}
@@ -349,14 +352,14 @@ export default function CurriculumDashboard({
                             </td>
 
                             {/* Delete Button */}
-                            <td className="py-3 px-2 text-right">
+                            <td className="py-3.5 px-2 text-right">
                               <button
                                 type="button"
                                 onClick={() =>
                                   handleDeleteCourse(sem.semester_number, course.id, course.name)
                                 }
                                 title="Delete course from this semester"
-                                className="rounded p-1 text-slate-500 hover:bg-red-950/60 hover:text-red-400 transition-colors"
+                                className="rounded-lg p-1.5 text-slate-500 hover:bg-red-950/60 hover:text-red-400 transition-colors"
                               >
                                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
