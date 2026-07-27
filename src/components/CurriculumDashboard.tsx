@@ -5,6 +5,7 @@ import { calculateSGPA, calculateCGPA, Course } from '@/lib/grading'
 import { saveLocalTrackerData, clearLocalTrackerData, LocalSemester, LocalCourse } from '@/lib/storage'
 import GradeSelector from './GradeSelector'
 import AddCourseModal from './AddCourseModal'
+import { Award, BookOpen, Plus, RotateCcw, Trash2, CheckCircle2, Edit3 } from 'lucide-react'
 
 interface CurriculumDashboardProps {
   branchId: string
@@ -156,51 +157,50 @@ export default function CurriculumDashboard({
 
   return (
     <div className="space-y-10">
-      {/* Executive Overall CGPA & Academic Progress Card */}
-      <div className="relative overflow-hidden rounded-3xl glass-card p-6 sm:p-10 shadow-2xl space-y-6">
+      {/* Executive Overall CGPA VisionOS Glass Card */}
+      <div className="relative overflow-hidden rounded-3xl vision-glass-panel p-6 sm:p-10 shadow-2xl space-y-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-xs font-black uppercase tracking-wider text-cyan-400">
+              <Award className="h-4 w-4 text-amber-400" />
+              <span className="text-xs font-black uppercase tracking-wider text-amber-400">
                 Cumulative Grade Point Average
               </span>
-              <span className="rounded-full bg-cyan-500/10 border border-cyan-400/30 px-3 py-0.5 text-[10px] font-extrabold text-cyan-300 backdrop-blur-md">
+              <span className="rounded-full border-t border-l border-white/40 bg-rose-500/20 px-3.5 py-0.5 text-[10px] font-black text-rose-300 backdrop-blur-md shadow-sm">
                 Branch: {branchId}
               </span>
             </div>
 
             <div className="mt-3 flex items-baseline gap-3">
-              <span className="text-5xl sm:text-6xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-cyan-300">
+              <span className="text-5xl sm:text-6xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-rose-400 via-amber-300 to-cyan-400">
                 {overallMetrics.overallCGPA > 0 ? overallMetrics.overallCGPA.toFixed(2) : 'N/A'}
               </span>
-              <span className="text-base sm:text-xl font-bold text-slate-400">
+              <span className="text-base sm:text-xl font-bold text-[var(--text-muted)]">
                 / 10.00
               </span>
             </div>
           </div>
 
           {/* Quick Metrics Stats */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 border-t md:border-t-0 md:border-l border-white/10 pt-4 md:pt-0 md:pl-8 text-slate-300">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 border-t md:border-t-0 md:border-l border-white/10 pt-4 md:pt-0 md:pl-8 text-[var(--text-main)]">
             <div>
-              <span className="text-xs font-semibold text-slate-400 block mb-1">Earned Credits</span>
-              <p className="text-xl font-black text-white">
-                {overallMetrics.totalEarnedCredits} <span className="text-xs font-normal text-slate-400">/ {overallMetrics.totalCurriculumCredits}</span>
+              <span className="text-xs font-bold text-[var(--text-muted)] block mb-1">Earned Credits</span>
+              <p className="text-xl font-black text-[var(--text-main)]">
+                {overallMetrics.totalEarnedCredits} <span className="text-xs font-normal text-[var(--text-muted)]">/ {overallMetrics.totalCurriculumCredits}</span>
               </p>
             </div>
             <div>
-              <span className="text-xs font-semibold text-slate-400 block mb-1">Courses Completed</span>
-              <p className="text-xl font-black text-white">
-                {overallMetrics.totalCompletedCourses} <span className="text-xs font-normal text-slate-400">/ {overallMetrics.totalCoursesCount}</span>
+              <span className="text-xs font-bold text-[var(--text-muted)] block mb-1">Courses Completed</span>
+              <p className="text-xl font-black text-[var(--text-main)]">
+                {overallMetrics.totalCompletedCourses} <span className="text-xs font-normal text-[var(--text-muted)]">/ {overallMetrics.totalCoursesCount}</span>
               </p>
             </div>
             <div className="col-span-2 sm:col-span-1">
               <button
                 onClick={handleResetCurriculum}
-                className="inline-flex items-center gap-1.5 glass-button-secondary rounded-xl px-3 py-1.5 text-xs font-bold text-slate-300 hover:text-red-400 transition-colors mt-2 sm:mt-0"
+                className="inline-flex items-center gap-1.5 rounded-2xl border-t border-l border-white/30 bg-white/10 px-3.5 py-2 text-xs font-extrabold text-[var(--text-muted)] hover:text-red-400 transition-colors mt-2 sm:mt-0"
               >
-                <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                </svg>
+                <RotateCcw className="h-3.5 w-3.5 text-rose-400" />
                 Change Branch
               </button>
             </div>
@@ -209,13 +209,13 @@ export default function CurriculumDashboard({
 
         {/* Global Multi-stop Progress Bar */}
         <div className="space-y-2">
-          <div className="flex justify-between text-xs font-semibold text-slate-400">
+          <div className="flex justify-between text-xs font-bold text-[var(--text-muted)]">
             <span>Overall Curriculum Completion</span>
-            <span className="text-cyan-400 font-extrabold">{overallMetrics.progressPercentage}%</span>
+            <span className="text-amber-400 font-black">{overallMetrics.progressPercentage}%</span>
           </div>
-          <div className="h-3 w-full overflow-hidden rounded-full bg-slate-950/80 p-0.5 border border-white/5">
+          <div className="h-3.5 w-full overflow-hidden rounded-full bg-slate-950/70 p-0.5 border-t border-l border-white/20 border-r border-b border-white/5">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-cyan-500 via-blue-500 to-violet-500 shadow-lg shadow-cyan-500/20 transition-all duration-500"
+              className="h-full rounded-full bg-gradient-to-r from-rose-500 via-amber-400 to-cyan-400 shadow-lg shadow-rose-500/25 transition-all duration-500"
               style={{ width: `${overallMetrics.progressPercentage}%` }}
             />
           </div>
@@ -225,8 +225,13 @@ export default function CurriculumDashboard({
       {/* 8 Semesters Curriculum Grid */}
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h3 className="text-2xl font-black text-white tracking-tight">Curriculum Semesters</h3>
-          <span className="text-xs text-slate-400 font-medium">8 Semesters Pre-loaded</span>
+          <div className="flex items-center gap-2.5">
+            <div className="p-2 rounded-2xl bg-rose-500/15 border-t border-l border-white/40">
+              <BookOpen className="h-5 w-5 text-rose-400" />
+            </div>
+            <h3 className="text-2xl font-black text-[var(--text-main)] tracking-tight">Curriculum Semesters</h3>
+          </div>
+          <span className="text-xs text-[var(--text-muted)] font-extrabold">8 Semesters Pre-loaded</span>
         </div>
 
         <div className="grid grid-cols-1 gap-6">
@@ -237,45 +242,43 @@ export default function CurriculumDashboard({
             return (
               <div
                 key={sem.id}
-                className="rounded-3xl glass-card glass-card-hover p-6 sm:p-8 space-y-6"
+                className="rounded-3xl vision-glass-card vision-glass-card-hover p-6 sm:p-8 space-y-6"
               >
                 {/* Semester Header, SGPA Badge, & Add Course Button */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-5">
                   <div>
                     <div className="flex items-center gap-3">
-                      <h4 className="text-xl font-black text-white">
+                      <h4 className="text-xl font-black text-[var(--text-main)]">
                         Semester {sem.semester_number}
                       </h4>
-                      <span className="rounded-xl border border-cyan-400/30 bg-cyan-500/10 px-3 py-1 text-xs font-extrabold text-cyan-300 backdrop-blur-md">
+                      <span className="rounded-xl border-t border-l border-white/40 bg-gradient-to-r from-amber-500/20 to-rose-500/20 px-3 py-1 text-xs font-black text-amber-300 backdrop-blur-md shadow-sm">
                         SGPA: {sem.sgpa > 0 ? sem.sgpa.toFixed(2) : 'N/A'}
                       </span>
                     </div>
-                    <p className="mt-1 text-xs text-slate-400 font-medium">
+                    <p className="mt-1 text-xs text-[var(--text-muted)] font-medium">
                       {sem.completedCount} of {sem.totalCount} Courses Completed • {sem.earnedCredits} / {sem.totalSemesterCredits} Credits Earned
                     </p>
                   </div>
 
                   <div className="flex items-center gap-4">
-                    {/* Add Course Button */}
+                    {/* Add Course Sunset Pill Button */}
                     <button
                       onClick={() => setActiveModalSemNumber(sem.semester_number)}
-                      className="glass-button-secondary rounded-xl px-4 py-2 text-xs font-extrabold text-cyan-300 flex items-center gap-1.5"
+                      className="pill-sunset rounded-2xl px-4 py-2 text-xs font-black flex items-center gap-1.5"
                     >
-                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
-                      </svg>
-                      + Add Course
+                      <Plus className="h-4 w-4 stroke-[3]" />
+                      Add Course
                     </button>
 
                     {/* Semester Progress Bar */}
                     <div className="hidden sm:block w-40 space-y-1.5">
-                      <div className="flex justify-between text-[11px] font-bold text-slate-400">
+                      <div className="flex justify-between text-[11px] font-black text-[var(--text-muted)]">
                         <span>Progress</span>
-                        <span className="text-cyan-400">{semProgress}%</span>
+                        <span className="text-amber-400">{semProgress}%</span>
                       </div>
-                      <div className="h-2 w-full overflow-hidden rounded-full bg-slate-950/80 border border-white/5">
+                      <div className="h-2.5 w-full overflow-hidden rounded-full bg-slate-950/70 border-t border-l border-white/20">
                         <div
-                          className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-emerald-400 transition-all duration-300"
+                          className="h-full rounded-full bg-gradient-to-r from-amber-400 to-cyan-400 transition-all duration-300"
                           style={{ width: `${semProgress}%` }}
                         />
                       </div>
@@ -285,8 +288,8 @@ export default function CurriculumDashboard({
 
                 {/* Course List Table */}
                 <div className="overflow-x-auto">
-                  <table className="w-full text-left text-sm text-slate-300">
-                    <thead className="text-[11px] uppercase font-bold text-slate-500 border-b border-white/5">
+                  <table className="w-full text-left text-sm text-[var(--text-main)]">
+                    <thead className="text-[11px] uppercase font-black text-[var(--text-muted)] border-b border-white/10">
                       <tr>
                         <th scope="col" className="py-3 px-4">Course Code & Name</th>
                         <th scope="col" className="py-3 px-3">Type</th>
@@ -302,46 +305,46 @@ export default function CurriculumDashboard({
                         const isFailed = course.grade === 'F'
 
                         return (
-                          <tr key={course.id} className="hover:bg-white/[0.03] transition-colors rounded-xl">
-                            <td className="py-3.5 px-4 font-semibold text-white">
+                          <tr key={course.id} className="hover:bg-white/[0.04] transition-colors rounded-2xl">
+                            <td className="py-4 px-4 font-bold text-[var(--text-main)]">
                               {course.name}
                             </td>
 
                             {/* Type Badge: Official vs Custom */}
-                            <td className="py-3.5 px-3">
+                            <td className="py-4 px-3">
                               {course.isCustom ? (
-                                <span className="inline-flex items-center gap-1 rounded-lg bg-indigo-950/60 border border-indigo-500/30 px-2.5 py-0.5 text-[10px] font-bold text-indigo-300 shadow-sm">
-                                  ✏ Custom
+                                <span className="inline-flex items-center gap-1 rounded-xl bg-purple-500/20 border-t border-l border-white/30 px-2.5 py-0.5 text-[10px] font-black text-purple-300 shadow-sm">
+                                  <Edit3 className="h-3 w-3 text-purple-300" /> Custom
                                 </span>
                               ) : (
-                                <span className="inline-flex items-center gap-1 rounded-lg bg-slate-800/60 border border-white/10 px-2.5 py-0.5 text-[10px] font-medium text-slate-400">
-                                  ✔ Curriculum
+                                <span className="inline-flex items-center gap-1 rounded-xl bg-cyan-500/15 border-t border-l border-white/30 px-2.5 py-0.5 text-[10px] font-bold text-cyan-300">
+                                  <CheckCircle2 className="h-3 w-3 text-cyan-400" /> Curriculum
                                 </span>
                               )}
                             </td>
 
-                            <td className="py-3.5 px-3 text-xs font-bold text-slate-400">
+                            <td className="py-4 px-3 text-xs font-black text-[var(--text-muted)]">
                               {course.credits} Cr
                             </td>
 
-                            <td className="py-3.5 px-3">
+                            <td className="py-4 px-3">
                               {isCompleted ? (
-                                <span className="inline-flex items-center rounded-lg bg-teal-950/60 border border-teal-500/30 px-2.5 py-0.5 text-[10px] font-extrabold text-teal-300 shadow-sm">
+                                <span className="inline-flex items-center rounded-xl bg-emerald-500/20 border-t border-l border-white/40 px-2.5 py-0.5 text-[10px] font-black text-emerald-300 shadow-sm">
                                   Completed
                                 </span>
                               ) : isFailed ? (
-                                <span className="inline-flex items-center rounded-lg bg-red-950/60 border border-red-500/30 px-2.5 py-0.5 text-[10px] font-extrabold text-red-300 shadow-sm">
+                                <span className="inline-flex items-center rounded-xl bg-rose-500/20 border-t border-l border-white/40 px-2.5 py-0.5 text-[10px] font-black text-rose-300 shadow-sm">
                                   Failed
                                 </span>
                               ) : (
-                                <span className="inline-flex items-center rounded-lg bg-slate-900/60 border border-white/10 px-2.5 py-0.5 text-[10px] font-medium text-slate-400">
+                                <span className="inline-flex items-center rounded-xl bg-slate-500/10 border border-white/10 px-2.5 py-0.5 text-[10px] font-medium text-[var(--text-muted)]">
                                   Not Started
                                 </span>
                               )}
                             </td>
 
                             {/* Grade Selector */}
-                            <td className="py-3.5 px-4 text-right">
+                            <td className="py-4 px-4 text-right">
                               <GradeSelector
                                 courseId={course.id}
                                 currentGrade={course.grade}
@@ -352,18 +355,16 @@ export default function CurriculumDashboard({
                             </td>
 
                             {/* Delete Button */}
-                            <td className="py-3.5 px-2 text-right">
+                            <td className="py-4 px-2 text-right">
                               <button
                                 type="button"
                                 onClick={() =>
                                   handleDeleteCourse(sem.semester_number, course.id, course.name)
                                 }
                                 title="Delete course from this semester"
-                                className="rounded-lg p-1.5 text-slate-500 hover:bg-red-950/60 hover:text-red-400 transition-colors"
+                                className="rounded-xl p-2 text-[var(--text-muted)] hover:bg-rose-500/20 hover:text-rose-400 transition-colors"
                               >
-                                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                </svg>
+                                <Trash2 className="h-4 w-4" />
                               </button>
                             </td>
                           </tr>
