@@ -6,6 +6,7 @@ export interface LocalCourse {
   name: string
   credits: number
   grade: string
+  isCustom?: boolean
 }
 
 export interface LocalSemester {
@@ -80,6 +81,7 @@ export function initializeLocalCurriculum(branchId: string): TrackerData {
       name: `${c.code}: ${c.name}`,
       credits: c.credits,
       grade: 'N/A',
+      isCustom: false,
     })
     semMap.set(c.semester, semList)
   })

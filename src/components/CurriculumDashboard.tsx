@@ -2,8 +2,9 @@
 
 import { useState, useMemo } from 'react'
 import { calculateSGPA, calculateCGPA, Course } from '@/lib/grading'
-import { saveLocalTrackerData, clearLocalTrackerData, LocalSemester } from '@/lib/storage'
+import { saveLocalTrackerData, clearLocalTrackerData, LocalSemester, LocalCourse } from '@/lib/storage'
 import GradeSelector from './GradeSelector'
+import AddCourseModal from './AddCourseModal'
 
 interface CurriculumDashboardProps {
   branchId: string
@@ -17,6 +18,7 @@ export default function CurriculumDashboard({
   onReset,
 }: CurriculumDashboardProps) {
   const [semesters, setSemesters] = useState<LocalSemester[]>(initialSemesters)
+  const [activeModalSemNumber, setActiveModalSemNumber] = useState<number | null>(null)
 
   // Handle grade change locally and persist to localStorage
   const handleGradeChange = (semesterId: string, courseId: string, newGrade: string) => {
@@ -31,7 +33,51 @@ export default function CurriculumDashboard({
         }
       })
 
-      // Persist immediately to localStorage
+      saveLocalTrackerData({
+        branchId,
+        semesters: updated,
+      })
+
+      return updated
+    })
+  }
+
+  // Handle adding a course (official or custom) to a semester
+  const handleAddCourseToSemester = (semesterNumber: number, newCourse: LocalCourse) => {
+    setSemesters((prevSemesters) => {
+      const updated = prevSemesters.map((sem) => {
+        if (sem.semester_number !== semesterNumber) return sem
+        return {
+          ...sem,
+          courses: [...sem.courses, newCourse],
+        }
+      })
+
+      saveLocalTrackerData({
+        branchId,
+        semesters: updated,
+      })
+
+      return updated
+    })
+  }
+
+  // Handle deleting a course from a semester
+  const handleDeleteCourse = (semesterNumber: number, courseId: string, courseName: string) => {
+    const confirmed = window.confirm(
+      `Are you sure you want to delete "${courseName}" from Semester ${semesterNumber}?`
+    )
+    if (!confirmed) return
+
+    setSemesters((prevSemesters) => {
+      const updated = prevSemesters.map((sem) => {
+        if (sem.semester_number !== semesterNumber) return sem
+        return {
+          ...sem,
+          courses: sem.courses.filter((c) => c.id !== courseId),
+        }
+      })
+
       saveLocalTrackerData({
         branchId,
         semesters: updated,
@@ -99,7 +145,7 @@ export default function CurriculumDashboard({
     }
   }, [processedSemesters])
 
-  // Reset curriculum action (to re-initialize branch)
+  // Reset curriculum action
   const handleResetCurriculum = () => {
     const confirmed = window.confirm(
       'Are you sure you want to reset your curriculum? This will clear your grade entries so you can select a new branch.'
@@ -191,7 +237,7 @@ export default function CurriculumDashboard({
                 key={sem.id}
                 className="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 sm:p-6 shadow-sm space-y-4"
               >
-                {/* Semester Header & SGPA Badge */}
+                {/* Semester Header, SGPA Badge, & Add Course Button */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800/80 pb-4">
                   <div>
                     <div className="flex items-center gap-3">
@@ -207,17 +253,30 @@ export default function CurriculumDashboard({
                     </p>
                   </div>
 
-                  {/* Semester Progress Bar */}
-                  <div className="w-full sm:w-48 space-y-1">
-                    <div className="flex justify-between text-[11px] font-medium text-slate-400">
-                      <span>Progress</span>
-                      <span>{semProgress}%</span>
-                    </div>
-                    <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-800">
-                      <div
-                        className="h-full rounded-full bg-teal-500 transition-all duration-300"
-                        style={{ width: `${semProgress}%` }}
-                      />
+                  <div className="flex items-center gap-3">
+                    {/* Add Course Button */}
+                    <button
+                      onClick={() => setActiveModalSemNumber(sem.semester_number)}
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-teal-500/30 bg-teal-500/10 px-3 py-1.5 text-xs font-semibold text-teal-400 hover:bg-teal-500/20 transition-all focus:outline-none"
+                    >
+                      <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                      </svg>
+                      + Add Course
+                    </button>
+
+                    {/* Semester Progress Bar */}
+                    <div className="hidden sm:block w-36 space-y-1">
+                      <div className="flex justify-between text-[11px] font-medium text-slate-400">
+                        <span>Progress</span>
+                        <span>{semProgress}%</span>
+                      </div>
+                      <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-800">
+                        <div
+                          className="h-full rounded-full bg-teal-500 transition-all duration-300"
+                          style={{ width: `${semProgress}%` }}
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -228,9 +287,11 @@ export default function CurriculumDashboard({
                     <thead className="text-[11px] uppercase font-semibold text-slate-500">
                       <tr>
                         <th scope="col" className="py-2 px-3">Course Code & Name</th>
+                        <th scope="col" className="py-2 px-3">Type</th>
                         <th scope="col" className="py-2 px-3">Credits</th>
                         <th scope="col" className="py-2 px-3">Status</th>
                         <th scope="col" className="py-2 px-3 text-right">Grade Selector</th>
+                        <th scope="col" className="py-2 px-2 text-right">Action</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-800/60">
@@ -243,6 +304,20 @@ export default function CurriculumDashboard({
                             <td className="py-3 px-3">
                               <span className="font-medium text-white block">{course.name}</span>
                             </td>
+
+                            {/* Type Badge: Official vs Custom */}
+                            <td className="py-3 px-3">
+                              {course.isCustom ? (
+                                <span className="inline-flex items-center gap-1 rounded-md bg-indigo-950/60 border border-indigo-800/40 px-2 py-0.5 text-[10px] font-semibold text-indigo-300">
+                                  ✏ Custom
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center gap-1 rounded-md bg-slate-800/60 border border-slate-700/40 px-2 py-0.5 text-[10px] font-medium text-slate-400">
+                                  ✔ Curriculum
+                                </span>
+                              )}
+                            </td>
+
                             <td className="py-3 px-3 text-xs font-semibold text-slate-400">
                               {course.credits} Cr
                             </td>
@@ -261,6 +336,8 @@ export default function CurriculumDashboard({
                                 </span>
                               )}
                             </td>
+
+                            {/* Grade Selector */}
                             <td className="py-3 px-3 text-right">
                               <GradeSelector
                                 courseId={course.id}
@@ -270,12 +347,41 @@ export default function CurriculumDashboard({
                                 }
                               />
                             </td>
+
+                            {/* Delete Button */}
+                            <td className="py-3 px-2 text-right">
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  handleDeleteCourse(sem.semester_number, course.id, course.name)
+                                }
+                                title="Delete course from this semester"
+                                className="rounded p-1 text-slate-500 hover:bg-red-950/60 hover:text-red-400 transition-colors"
+                              >
+                                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                              </button>
+                            </td>
                           </tr>
                         )
                       })}
                     </tbody>
                   </table>
                 </div>
+
+                {/* Add Course Modal Anchor */}
+                {activeModalSemNumber === sem.semester_number && (
+                  <AddCourseModal
+                    semesterNumber={sem.semester_number}
+                    branchId={branchId}
+                    existingCourses={sem.courses}
+                    onAddCourse={(newCourse) =>
+                      handleAddCourseToSemester(sem.semester_number, newCourse)
+                    }
+                    onClose={() => setActiveModalSemNumber(null)}
+                  />
+                )}
               </div>
             )
           })}
