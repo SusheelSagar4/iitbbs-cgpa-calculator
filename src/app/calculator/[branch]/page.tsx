@@ -152,10 +152,10 @@ export default function CalculatorPage({ params }: PageProps) {
           </div>
           <div>
             <Link
-              href="/dashboard"
+              href="/select-branch"
               className="text-sm font-semibold text-white bg-[var(--color-slate)] hover:bg-[var(--color-slate)]/80 px-5 py-2.5 rounded-full border border-[var(--color-slate)] hover:border-[var(--color-gold)] transition-all duration-300 backdrop-blur-sm shadow-sm"
             >
-              Dashboard
+              Change Branch
             </Link>
           </div>
         </div>

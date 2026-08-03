@@ -51,11 +51,7 @@ const BUILDINGS: Building[] = [
   },
 ]
 
-interface LandingHeroProps {
-  isLoggedIn: boolean
-}
-
-export function LandingHero({ isLoggedIn }: LandingHeroProps) {
+export function LandingHero() {
   const router = useRouter()
   const [progress, setProgress] = useState(0)
   const wrapperRef = useRef<HTMLDivElement>(null)
@@ -154,11 +150,11 @@ export function LandingHero({ isLoggedIn }: LandingHeroProps) {
     }
   }, [activeIndex])
 
-  const handleNavigate = (branchId: string, label: string) => {
-    setLoadingBranch(label)
+  const handleNavigate = (branchId: string, slug: string) => {
+    setLoadingBranch(slug)
     initializeLocalCurriculum(branchId)
     setTimeout(() => {
-      router.push('/dashboard')
+      router.push(`/calculator/${slug}`)
     }, 450)
   }
 
@@ -200,21 +196,12 @@ export function LandingHero({ isLoggedIn }: LandingHeroProps) {
           </div>
           
           <div>
-            {isLoggedIn ? (
-              <Link
-                href="/dashboard"
-                className="text-sm font-semibold text-[#F5F1E8] hover:text-white bg-[#1E3A5F]/60 hover:bg-[#1E3A5F]/80 px-5 py-2.5 rounded-full border border-[#8B94A3]/50 hover:border-[#D4A853] transition-all duration-300 backdrop-blur-md shadow-sm"
-              >
-                Go to Dashboard
-              </Link>
-            ) : (
-              <Link
-                href="/login"
-                className="text-sm font-semibold text-[#F5F1E8] hover:text-white bg-[#1E3A5F]/60 hover:bg-[#1E3A5F]/80 px-5 py-2.5 rounded-full border border-[#8B94A3]/50 hover:border-[#D4A853] transition-all duration-300 backdrop-blur-md shadow-sm"
-              >
-                Sign In
-              </Link>
-            )}
+            <Link
+              href="/select-branch"
+              className="text-sm font-semibold text-[#F5F1E8] hover:text-white bg-[#1E3A5F]/60 hover:bg-[#1E3A5F]/80 px-5 py-2.5 rounded-full border border-[#8B94A3]/50 hover:border-[#D4A853] transition-all duration-300 backdrop-blur-md shadow-sm"
+            >
+              Go to Calculator
+            </Link>
           </div>
         </header>
 
@@ -403,28 +390,12 @@ export function LandingHero({ isLoggedIn }: LandingHeroProps) {
           </p>
 
           {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center w-full max-w-xs sm:max-w-none">
-            {isLoggedIn ? (
-              <Link
-                href="/dashboard"
-                className="w-full sm:w-auto bg-[#D4A853] hover:bg-[#B8873F] text-[#0A1628] font-bold px-8 py-4 rounded-full shadow-lg shadow-[#D4A853]/20 hover:shadow-[#D4A853]/40 hover:-translate-y-0.5 transition-all duration-300 transform text-base focus:outline-none focus:ring-2 focus:ring-[#D4A853] focus:ring-offset-2 focus:ring-offset-[#0A1628] text-center"
-              >
-                Go to Dashboard
-              </Link>
-            ) : (
-              <Link
-                href="/login"
-                className="w-full sm:w-auto bg-[#D4A853] hover:bg-[#B8873F] text-[#0A1628] font-bold px-8 py-4 rounded-full shadow-lg shadow-[#D4A853]/20 hover:shadow-[#D4A853]/40 hover:-translate-y-0.5 transition-all duration-300 transform text-base focus:outline-none focus:ring-2 focus:ring-[#D4A853] focus:ring-offset-2 focus:ring-offset-[#0A1628] text-center"
-              >
-                Calculate Now
-              </Link>
-            )}
-
+          <div className="flex justify-center items-center w-full max-w-xs sm:max-w-none">
             <Link
-              href="/login?signup=true"
-              className="w-full sm:w-auto text-[#F5F1E8] hover:text-white font-medium px-8 py-4 rounded-full border border-[#8B94A3] hover:border-[#D4A853] bg-[#1E3A5F]/40 hover:bg-[#1E3A5F]/70 backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 text-center text-base"
+              href="/select-branch"
+              className="w-full sm:w-auto bg-[#D4A853] hover:bg-[#B8873F] text-[#0A1628] font-bold px-8 py-4 rounded-full shadow-lg shadow-[#D4A853]/20 hover:shadow-[#D4A853]/40 hover:-translate-y-0.5 transition-all duration-300 transform text-base focus:outline-none focus:ring-2 focus:ring-[#D4A853] focus:ring-offset-2 focus:ring-offset-[#0A1628] text-center"
             >
-              How it works ↓
+              Go to Calculator
             </Link>
           </div>
         </div>
