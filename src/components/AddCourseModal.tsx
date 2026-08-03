@@ -259,7 +259,7 @@ export default function AddCourseModal({
                           isAlreadyAdded
                             ? 'opacity-40 cursor-not-allowed bg-slate-950/40'
                             : isSelected
-                            ? 'bg-gradient-to-r from-[var(--color-gold)]/15 to-[var(--color-tan)]/10 border-l-4 border-[var(--color-gold)] text-[var(--color-gold)] font-bold'
+                            ? 'bg-gradient-to-r from-[var(--color-gold)]/15 to-[var(--color-slate)]/10 border-l-4 border-[var(--color-gold)] text-[var(--color-gold)] font-bold'
                             : 'hover:bg-white/5 cursor-pointer text-[var(--text-main)]'
                         }`}
                       >
@@ -278,7 +278,7 @@ export default function AddCourseModal({
                           </span>
                         ) : (
                           isSelected && (
-                            <span className="h-6 w-6 rounded-full bg-gradient-to-r from-[var(--color-gold)] to-[var(--color-tan)] text-[#3F0D0C] flex items-center justify-center font-black shadow-md">
+                            <span className="h-6 w-6 rounded-full bg-gradient-to-r from-[var(--color-gold)] to-[#e6be6e] text-[#0A1628] flex items-center justify-center font-black shadow-md">
                               <Check className="h-3.5 w-3.5 stroke-[3]" />
                             </span>
                           )
@@ -292,7 +292,7 @@ export default function AddCourseModal({
 
             {/* Selected Course Preview */}
             {selectedCourse && (
-              <div className="rounded-2xl border border-[var(--color-gold)]/20 bg-gradient-to-br from-[var(--color-gold)]/15 via-[var(--color-tan)]/10 to-transparent p-4 space-y-3 backdrop-blur-md">
+              <div className="rounded-2xl border border-[var(--color-gold)]/20 bg-gradient-to-br from-[var(--color-gold)]/15 via-[var(--color-slate)]/10 to-transparent p-4 space-y-3 backdrop-blur-md">
                 <div className="flex justify-between items-center text-xs">
                   <div>
                     <span className="text-[var(--text-muted)] font-semibold block">Selected Course:</span>

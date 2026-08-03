@@ -172,7 +172,7 @@ export default function CurriculumDashboard({
             </div>
 
             <div className="mt-3 flex items-baseline gap-3">
-              <span className="text-5xl sm:text-6xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[var(--color-gold)] via-[var(--color-tan)] to-[var(--color-brown)]">
+              <span className="text-5xl sm:text-6xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[var(--color-gold)] via-[var(--color-muted)] to-[var(--color-slate)]">
                 {overallMetrics.overallCGPA > 0 ? overallMetrics.overallCGPA.toFixed(2) : 'N/A'}
               </span>
               <span className="text-base sm:text-xl font-bold text-[var(--text-muted)]">
@@ -215,7 +215,7 @@ export default function CurriculumDashboard({
           </div>
           <div className="h-3.5 w-full overflow-hidden rounded-full bg-slate-950/70 p-0.5 border-t border-l border-white/20 border-r border-b border-white/5">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-[var(--color-gold)] via-[var(--color-tan)] to-[var(--color-brown)] shadow-lg shadow-[var(--color-gold)]/20 transition-all duration-500"
+              className="h-full rounded-full bg-gradient-to-r from-[var(--color-gold)] via-[var(--color-muted)] to-[var(--color-slate)] shadow-lg shadow-[var(--color-gold)]/20 transition-all duration-500"
               style={{ width: `${overallMetrics.progressPercentage}%` }}
             />
           </div>
@@ -278,7 +278,7 @@ export default function CurriculumDashboard({
                       </div>
                       <div className="h-2.5 w-full overflow-hidden rounded-full bg-slate-950/70 border-t border-l border-white/20">
                         <div
-                          className="h-full rounded-full bg-gradient-to-r from-[var(--color-gold)] to-[var(--color-tan)] transition-all duration-300"
+                          className="h-full rounded-full bg-gradient-to-r from-[var(--color-gold)] to-[var(--color-slate)] transition-all duration-300"
                           style={{ width: `${semProgress}%` }}
                         />
                       </div>

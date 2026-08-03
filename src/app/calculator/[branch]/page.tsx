@@ -128,23 +128,23 @@ export default function CalculatorPage({ params }: PageProps) {
 
   if (!isMounted) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-t-amber-400 border-slate-700"></div>
+      <div className="min-h-screen bg-[var(--color-navy)] flex items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-t-[var(--color-gold)] border-[var(--color-slate)]"></div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 pb-12">
+    <div className="min-h-screen bg-[var(--color-offwhite)] text-[var(--color-navy)] pb-12">
       {/* Header */}
-      <header className="sticky top-0 z-10 border-b border-slate-800/80 bg-slate-900/60 backdrop-blur-md">
+      <header className="sticky top-0 z-10 border-b border-[var(--color-slate)]/10 bg-[var(--color-navy)] backdrop-blur-md">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3">
-            <Link href="/" className="flex h-8 w-8 items-center justify-center rounded-lg border border-amber-500/20 bg-amber-500/10 text-sm font-bold text-amber-400 hover:bg-amber-500/20 transition-colors">
+            <Link href="/" className="flex h-8 w-8 items-center justify-center rounded-lg border border-[var(--color-gold)]/20 bg-[var(--color-gold)]/10 text-sm font-bold text-[var(--color-gold)] hover:bg-[var(--color-gold)]/20 transition-colors">
               &larr;
             </Link>
             <div>
-              <span className="text-[10px] font-mono tracking-widest text-amber-400 uppercase leading-none block">IIT BHUBANESWAR</span>
+              <span className="text-[10px] font-mono tracking-widest text-[var(--color-gold)] uppercase leading-none block">IIT BHUBANESWAR</span>
               <h1 className="text-base sm:text-lg font-bold tracking-tight text-white leading-tight">
                 {curriculum.name}
               </h1>
@@ -153,7 +153,7 @@ export default function CalculatorPage({ params }: PageProps) {
           <div>
             <Link
               href="/dashboard"
-              className="text-sm font-semibold text-white bg-slate-800/80 hover:bg-slate-700/80 px-5 py-2.5 rounded-full border border-slate-700/50 hover:border-slate-600/50 transition-all duration-300 backdrop-blur-sm shadow-sm"
+              className="text-sm font-semibold text-white bg-[var(--color-slate)] hover:bg-[var(--color-slate)]/80 px-5 py-2.5 rounded-full border border-[var(--color-slate)] hover:border-[var(--color-gold)] transition-all duration-300 backdrop-blur-sm shadow-sm"
             >
               Dashboard
             </Link>
@@ -164,12 +164,12 @@ export default function CalculatorPage({ params }: PageProps) {
       {/* Main Container */}
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 space-y-8 animate-fade-in-up">
         {/* Semester selector tabs */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[var(--color-slate)]/10 pb-4">
           <div>
-            <h2 className="text-xl font-extrabold text-white">CGPA Predictor & Course Selector</h2>
-            <p className="text-sm text-slate-400">Select a semester to populate its curriculum subjects and predict grades.</p>
+            <h2 className="text-xl font-extrabold text-[var(--color-navy)]">CGPA Predictor & Course Selector</h2>
+            <p className="text-sm text-[var(--color-muted)]">Select a semester to populate its curriculum subjects and predict grades.</p>
           </div>
-          <div className="flex gap-2 p-1 bg-slate-900 rounded-lg border border-slate-800 self-start sm:self-auto">
+          <div className="flex gap-2 p-1.5 bg-white rounded-2xl border border-[var(--color-slate)]/10 self-start sm:self-auto shadow-sm">
             {[1, 2, 3, 4].map((semNum) => (
               <button
                 key={semNum}
@@ -177,10 +177,10 @@ export default function CalculatorPage({ params }: PageProps) {
                   setSelectedSemester(semNum)
                   setGrades({}) // Reset grades on semester change
                 }}
-                className={`px-4 py-1.5 text-xs font-semibold rounded-md transition-colors ${
+                className={`px-4 py-1.5 text-xs font-bold rounded-xl transition-all ${
                   selectedSemester === semNum
-                    ? 'bg-amber-500 text-slate-950 shadow-sm'
-                    : 'text-slate-400 hover:text-white'
+                    ? 'bg-[var(--color-gold)] text-[var(--color-navy)] shadow-sm'
+                    : 'text-[var(--color-muted)] hover:text-[var(--color-navy)]'
                 }`}
               >
                 Sem {semNum}
@@ -192,10 +192,10 @@ export default function CalculatorPage({ params }: PageProps) {
         {/* Dynamic Calculator Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Subjects Table (Left Side) */}
-          <div className="lg:col-span-8 rounded-xl border border-slate-800 bg-slate-900/60 shadow-md overflow-hidden">
+          <div className="lg:col-span-8 rounded-3xl border border-[var(--color-slate)]/15 bg-white shadow-xl overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm text-slate-300">
-                <thead className="border-b border-slate-800 bg-slate-900/90 text-xs uppercase font-semibold text-slate-400">
+              <table className="w-full text-left text-sm text-[var(--color-navy)]">
+                <thead className="border-b border-[var(--color-slate)]/10 bg-[var(--color-slate)]/5 text-xs uppercase font-bold text-[var(--color-navy)]/80">
                   <tr>
                     <th scope="col" className="px-6 py-4">Code</th>
                     <th scope="col" className="px-6 py-4">Subject Name</th>
@@ -203,22 +203,22 @@ export default function CalculatorPage({ params }: PageProps) {
                     <th scope="col" className="px-6 py-4 w-48">Expected Grade</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-800/80">
+                <tbody className="divide-y divide-[var(--color-slate)]/10">
                   {courses.map((course) => {
                     const currentGrade = grades[course.code] || ''
                     return (
-                      <tr key={course.code} className="hover:bg-slate-800/30 transition-colors">
-                        <td className="px-6 py-4 font-mono text-xs text-amber-400 font-bold">{course.code}</td>
-                        <td className="px-6 py-4 font-medium text-white">{course.name}</td>
-                        <td className="px-6 py-4 text-slate-300 font-medium">{course.credits}</td>
+                      <tr key={course.code} className="hover:bg-[var(--color-slate)]/[0.03] transition-colors">
+                        <td className="px-6 py-4 font-mono text-xs text-[var(--color-gold)] font-black">{course.code}</td>
+                        <td className="px-6 py-4 font-bold text-[var(--color-navy)]">{course.name}</td>
+                        <td className="px-6 py-4 text-[var(--color-navy)]/80 font-semibold">{course.credits}</td>
                         <td className="px-6 py-4">
                           <select
                             value={currentGrade}
                             onChange={(e) => handleGradeChange(course.code, e.target.value as Grade | '')}
-                            className={`w-full rounded-lg border px-3 py-2 text-sm bg-slate-800 text-white focus:outline-none focus:ring-1 focus:ring-amber-400 ${
+                            className={`w-full rounded-xl border px-3 py-2 text-sm bg-white text-[var(--color-navy)] focus:outline-none focus:ring-2 focus:ring-[var(--color-gold)] focus:border-[var(--color-gold)] ${
                               currentGrade 
-                                ? 'border-amber-500/60 ring-1 ring-amber-500/20' 
-                                : 'border-slate-700'
+                                ? 'border-[var(--color-gold)] ring-1 ring-[var(--color-gold)]/20' 
+                                : 'border-[var(--color-slate)]/30'
                             }`}
                           >
                             <option value="">-- Select Grade --</option>
@@ -239,39 +239,39 @@ export default function CalculatorPage({ params }: PageProps) {
 
           {/* Predictor Panel Card (Right Side) */}
           <div className="lg:col-span-4 space-y-6">
-            <div className="rounded-xl border border-slate-800 bg-slate-900/80 p-6 shadow-lg space-y-6">
-              <h3 className="text-sm font-bold uppercase tracking-wider text-slate-400 border-b border-slate-800 pb-3">
+            <div className="rounded-3xl border border-[var(--color-slate)]/15 bg-white p-6 shadow-xl space-y-6">
+              <h3 className="text-sm font-black uppercase tracking-wider text-[var(--color-navy)]/80 border-b border-[var(--color-slate)]/10 pb-3">
                 Live Calculation
               </h3>
 
               {/* Large SGPA Display */}
-              <div className="text-center py-6 bg-slate-950/60 rounded-xl border border-slate-800/50 relative overflow-hidden">
+              <div className="text-center py-6 bg-[var(--color-slate)]/5 rounded-2xl border border-[var(--color-slate)]/15 relative overflow-hidden">
                 {/* Background ambient gold aura */}
-                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 rounded-full bg-amber-500/5 blur-3xl" />
-                <span className="text-xs font-semibold text-slate-400 uppercase tracking-widest block mb-2">
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 rounded-full bg-[var(--color-gold)]/5 blur-3xl" />
+                <span className="text-xs font-bold text-[var(--color-navy)]/60 uppercase tracking-widest block mb-2">
                   Expected SGPA
                 </span>
-                <span className="text-5xl font-extrabold tracking-tight text-white">
+                <span className="text-5xl font-black tracking-tight text-[var(--color-navy)]">
                   {liveSGPA.toFixed(2)}
                 </span>
-                <span className="text-sm font-medium text-slate-500 ml-1">/ 10.0</span>
+                <span className="text-sm font-medium text-[var(--color-navy)]/65 ml-1">/ 10.0</span>
               </div>
 
               {/* Selection Progress Details */}
-              <div className="space-y-3.5 text-sm text-slate-300">
+              <div className="space-y-3.5 text-sm text-[var(--color-navy)]/80">
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Total Semester Credits:</span>
-                  <span className="font-semibold text-white">{totalSemesterCredits}</span>
+                  <span className="text-[var(--color-navy)]/65">Total Semester Credits:</span>
+                  <span className="font-bold text-[var(--color-navy)]">{totalSemesterCredits}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Graded Credits:</span>
-                  <span className={`font-semibold ${totalCreditsSelected === totalSemesterCredits ? 'text-teal-400' : 'text-amber-400'}`}>
+                  <span className="text-[var(--color-navy)]/65">Graded Credits:</span>
+                  <span className={`font-bold ${totalCreditsSelected === totalSemesterCredits ? 'text-emerald-600' : 'text-[var(--color-gold)]'}`}>
                     {totalCreditsSelected} / {totalSemesterCredits}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Graded Subjects:</span>
-                  <span className="font-semibold text-white">
+                  <span className="text-[var(--color-navy)]/65">Graded Subjects:</span>
+                  <span className="font-bold text-[var(--color-navy)]">
                     {selectedCoursesForCalculation.length} / {courses.length}
                   </span>
                 </div>
@@ -281,11 +281,7 @@ export default function CalculatorPage({ params }: PageProps) {
               <button
                 onClick={handleSaveToDashboard}
                 disabled={saveSuccess}
-                className={`w-full font-bold px-6 py-4 rounded-full shadow-lg transition-all duration-300 transform text-center block text-base ${
-                  saveSuccess
-                    ? 'bg-teal-500 text-white shadow-teal-500/20'
-                    : 'bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 shadow-amber-500/20 hover:shadow-amber-500/35 hover:-translate-y-0.5'
-                }`}
+                className={`w-full pill-sunset font-bold px-6 py-4 rounded-full shadow-lg hover:-translate-y-0.5 transition-all duration-300 transform text-center block text-base disabled:opacity-50`}
               >
                 {saveSuccess ? (
                   <span className="flex items-center justify-center gap-2">
@@ -295,13 +291,13 @@ export default function CalculatorPage({ params }: PageProps) {
                     Saved to Dashboard!
                   </span>
                 ) : (
-                  'Add to Dashboard &rarr;'
+                  'Add to Dashboard \u2192'
                 )}
               </button>
             </div>
 
             {/* Hint Box */}
-            <div className="rounded-xl border border-slate-800/40 bg-slate-950/30 p-5 text-xs text-slate-400 leading-relaxed">
+            <div className="rounded-2xl border border-[var(--color-slate)]/10 bg-[var(--color-slate)]/[0.04] p-5 text-xs text-[var(--color-navy)]/85 leading-relaxed">
               💡 **Curriculum Synced**: The course structures above are synchronized with the standard B.Tech syllabus at IIT Bhubaneswar for this branch. Adding this semester will update your cumulative CGPA directly in your Dashboard.
             </div>
           </div>

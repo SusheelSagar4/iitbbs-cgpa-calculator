@@ -26,12 +26,12 @@ export default function Onboarding({ onCurriculumInitialized }: OnboardingProps)
     <div className="mx-auto max-w-5xl py-8 px-4 animate-modal-scale">
       {/* Onboarding Hero Section */}
       <div className="text-center space-y-4 mb-12">
-        <span className="inline-flex items-center gap-1.5 rounded-full border-t border-l border-white/40 bg-gradient-to-r from-[var(--color-gold)]/20 via-[var(--color-tan)]/15 to-[var(--color-brown)]/20 px-4 py-1 text-xs font-bold text-[var(--color-gold)] backdrop-blur-xl shadow-lg shadow-[var(--color-gold)]/10">
+        <span className="inline-flex items-center gap-1.5 rounded-full border-t border-l border-white/40 bg-gradient-to-r from-[var(--color-gold)]/20 via-[var(--color-slate)]/15 to-[var(--color-navy)]/20 px-4 py-1 text-xs font-bold text-[var(--color-gold)] backdrop-blur-xl shadow-lg shadow-[var(--color-gold)]/10">
           <Sparkles className="h-3.5 w-3.5 text-[var(--color-gold)]" />
           VisionOS Spatial Curriculum Tracker
         </span>
         <h2 className="text-3xl sm:text-5xl font-black tracking-tight text-[var(--text-main)]">
-          Select Your <span className="bg-gradient-to-r from-[var(--color-gold)] via-[var(--color-tan)] to-[var(--color-brown)] bg-clip-text text-transparent">Academic Department</span>
+          Select Your <span className="bg-gradient-to-r from-[var(--color-gold)] via-[var(--color-muted)] to-[var(--color-slate)] bg-clip-text text-transparent">Academic Department</span>
         </h2>
         <p className="mx-auto max-w-2xl text-sm sm:text-base text-[var(--text-muted)] leading-relaxed">
           Choose your branch to generate your complete 8-semester curriculum automatically, pre-loaded with official course credits, weightages, and instant live SGPA/CGPA calculations.
@@ -49,7 +49,7 @@ export default function Onboarding({ onCurriculumInitialized }: OnboardingProps)
               onClick={() => setSelectedBranchId(b.id)}
               className={`relative flex flex-col justify-between rounded-3xl p-6 transition-all duration-300 cursor-pointer vision-glass-card ${
                 isSelected
-                  ? 'border-t-2 border-l-2 border-[var(--color-gold)]/80 bg-slate-900/30 shadow-[0_20px_50px_rgba(217,176,97,0.15)] translate-y-[-4px]'
+                  ? 'border-t-2 border-l-2 border-[var(--color-gold)]/80 bg-[var(--color-slate)]/30 shadow-[0_20px_50px_rgba(212,168,83,0.15)] translate-y-[-4px]'
                   : 'vision-glass-card-hover'
               }`}
             >
@@ -59,7 +59,7 @@ export default function Onboarding({ onCurriculumInitialized }: OnboardingProps)
                     {b.code}
                   </span>
                   {isSelected && (
-                    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-r from-[var(--color-gold)] to-[var(--color-tan)] text-[#3F0D0C] font-black shadow-lg shadow-[var(--color-gold)]/30">
+                    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-r from-[var(--color-gold)] to-[#e6be6e] text-[#0A1628] font-black shadow-lg shadow-[var(--color-gold)]/30">
                       <Check className="h-4 w-4 stroke-[3]" />
                     </span>
                   )}
