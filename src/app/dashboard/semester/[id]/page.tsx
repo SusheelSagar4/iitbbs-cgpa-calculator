@@ -1,9 +1,11 @@
+'use client'
+
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
-import CourseManager, { CourseItem } from '@/components/CourseManager'
+import { useRouter } from 'next/navigation'
+import CourseManager from '@/components/CourseManager'
 import DeleteSemesterButton from '@/components/DeleteSemesterButton'
-import { Grade } from '@/lib/grading'
+import { SemesterItem } from '../../page'
 
 interface PageProps {
   params: {
@@ -11,48 +13,58 @@ interface PageProps {
   }
 }
 
-export default async function SemesterDetailPage({ params }: PageProps) {
-  const supabase = createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    redirect('/login')
-  }
-
+export default function SemesterDetailPage({ params }: PageProps) {
+  const router = useRouter()
   const semesterId = params.id
 
-  // Fetch semester row by id and verify ownership
-  const { data: semester, error: semesterError } = await supabase
-    .from('semesters')
-    .select('id, user_id, semester_number')
-    .eq('id', semesterId)
-    .single()
+  const [semester, setSemester] = useState<SemesterItem | null>(null)
+  const [isMounted, setIsMounted] = useState(false)
 
-  if (semesterError || !semester || semester.user_id !== user.id) {
-    redirect('/dashboard')
+  useEffect(() => {
+    const saved = localStorage.getItem('iitbbs_semesters')
+    if (saved) {
+      try {
+        const semestersList: SemesterItem[] = JSON.parse(saved)
+        const found = semestersList.find((s) => s.id === semesterId)
+        if (found) {
+          setSemester(found)
+        } else {
+          router.push('/dashboard')
+        }
+      } catch (e) {
+        console.error('Error loading semester details:', e)
+        router.push('/dashboard')
+      }
+    } else {
+      router.push('/dashboard')
+    }
+    setIsMounted(true)
+  }, [semesterId, router])
+
+  const handleDeleteSemester = () => {
+    const saved = localStorage.getItem('iitbbs_semesters')
+    if (saved) {
+      try {
+        const semestersList: SemesterItem[] = JSON.parse(saved)
+        const updated = semestersList.filter((s) => s.id !== semesterId)
+        localStorage.setItem('iitbbs_semesters', JSON.stringify(updated))
+      } catch (e) {
+        console.error('Error deleting semester:', e)
+      }
+    }
+    router.push('/dashboard')
   }
 
-  // Fetch courses for this semester
-  const { data: coursesData, error: coursesError } = await supabase
-    .from('courses')
-    .select('id, name, credits, grade')
-    .eq('semester_id', semesterId)
-
-  if (coursesError) {
-    console.error('Error fetching courses for semester:', coursesError.message)
+  if (!isMounted || !semester) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-t-teal-500 border-slate-700"></div>
+      </div>
+    )
   }
-
-  const initialCourses: CourseItem[] = (coursesData || []).map((c) => ({
-    id: c.id,
-    name: c.name,
-    credits: Number(c.credits),
-    grade: c.grade as Grade,
-  }))
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in-up">
       {/* Header & Navigation */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -66,13 +78,13 @@ export default async function SemesterDetailPage({ params }: PageProps) {
             Semester {semester.semester_number}
           </h2>
         </div>
-        <DeleteSemesterButton semesterId={semester.id} />
+        <DeleteSemesterButton onDeleteSemester={handleDeleteSemester} />
       </div>
 
       {/* Course Manager Client Component */}
       <CourseManager
         semesterId={semester.id}
-        initialCourses={initialCourses}
+        initialCourses={semester.courses}
       />
     </div>
   )

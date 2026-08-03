@@ -135,7 +135,7 @@ export default function AddCourseModal({
         <div className="flex items-center justify-between border-b border-white/10 pb-4">
           <div>
             <div className="flex items-center gap-2">
-              <span className="rounded-xl border-t border-l border-white/40 bg-rose-500/20 px-2.5 py-0.5 text-[10px] font-black text-rose-300">
+              <span className="rounded-xl border border-[var(--color-gold)]/30 bg-[var(--color-gold)]/10 px-2.5 py-0.5 text-[10px] font-black text-[var(--color-gold)]">
                 Semester {semesterNumber}
               </span>
               <h3 className="text-xl font-black text-[var(--text-main)]">Add Course</h3>
@@ -204,7 +204,7 @@ export default function AddCourseModal({
                     id="dept-filter"
                     value={selectedBranch}
                     onChange={(e) => setSelectedBranch(e.target.value)}
-                    className="glass-input rounded-xl px-3 py-1.5 text-xs text-amber-400 font-bold focus:outline-none"
+                    className="glass-input rounded-xl px-3 py-1.5 text-xs text-[var(--color-gold)] font-bold focus:outline-none"
                   >
                     {BRANCHES.map((b) => (
                       <option key={b.id} value={b.id} className="bg-slate-900 text-white">
@@ -218,7 +218,7 @@ export default function AddCourseModal({
                     type="checkbox"
                     checked={showAllBranches}
                     onChange={(e) => setShowAllBranches(e.target.checked)}
-                    className="rounded border-[var(--glass-border)] bg-transparent text-amber-500 focus:ring-amber-400"
+                    className="rounded border-[var(--glass-border)] bg-transparent text-[var(--color-gold)] focus:ring-[var(--color-gold)]"
                   />
                   <span>All Branches</span>
                 </label>
@@ -259,13 +259,13 @@ export default function AddCourseModal({
                           isAlreadyAdded
                             ? 'opacity-40 cursor-not-allowed bg-slate-950/40'
                             : isSelected
-                            ? 'bg-gradient-to-r from-rose-500/20 to-amber-500/20 border-l-4 border-amber-400 text-amber-200 font-bold'
+                            ? 'bg-gradient-to-r from-[var(--color-gold)]/15 to-[var(--color-slate)]/10 border-l-4 border-[var(--color-gold)] text-[var(--color-gold)] font-bold'
                             : 'hover:bg-white/5 cursor-pointer text-[var(--text-main)]'
                         }`}
                       >
                         <div className="flex flex-col gap-0.5 max-w-[75%]">
                           <div className="flex items-center gap-2">
-                            <span className="font-mono font-black text-amber-400">{c.code}</span>
+                            <span className="font-mono font-black text-[var(--color-gold)]">{c.code}</span>
                             <span className="truncate text-[var(--text-main)] font-semibold">{c.name}</span>
                           </div>
                           <span className="text-[10px] text-[var(--text-muted)] font-medium">
@@ -273,12 +273,12 @@ export default function AddCourseModal({
                           </span>
                         </div>
                         {isAlreadyAdded ? (
-                          <span className="rounded-lg bg-amber-500/20 border border-amber-500/30 px-2 py-0.5 text-[10px] font-black text-amber-400">
+                          <span className="rounded-lg bg-[var(--color-gold)]/10 border border-[var(--color-gold)]/20 px-2 py-0.5 text-[10px] font-black text-[var(--color-gold)]">
                             Already Added
                           </span>
                         ) : (
                           isSelected && (
-                            <span className="h-6 w-6 rounded-full bg-gradient-to-r from-amber-400 to-rose-500 text-slate-950 flex items-center justify-center font-black shadow-md">
+                            <span className="h-6 w-6 rounded-full bg-gradient-to-r from-[var(--color-gold)] to-[#e6be6e] text-[#0A1628] flex items-center justify-center font-black shadow-md">
                               <Check className="h-3.5 w-3.5 stroke-[3]" />
                             </span>
                           )
@@ -292,7 +292,7 @@ export default function AddCourseModal({
 
             {/* Selected Course Preview */}
             {selectedCourse && (
-              <div className="rounded-2xl border-t border-l border-white/40 bg-gradient-to-br from-rose-500/15 via-amber-500/10 to-transparent p-4 space-y-3 backdrop-blur-md">
+              <div className="rounded-2xl border border-[var(--color-gold)]/20 bg-gradient-to-br from-[var(--color-gold)]/15 via-[var(--color-slate)]/10 to-transparent p-4 space-y-3 backdrop-blur-md">
                 <div className="flex justify-between items-center text-xs">
                   <div>
                     <span className="text-[var(--text-muted)] font-semibold block">Selected Course:</span>

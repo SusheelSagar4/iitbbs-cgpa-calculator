@@ -1,59 +1,30 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
 
 interface DeleteSemesterButtonProps {
-  semesterId: string
+  onDeleteSemester: () => void
 }
 
 export default function DeleteSemesterButton({
-  semesterId,
+  onDeleteSemester,
 }: DeleteSemesterButtonProps) {
   const [loading, setLoading] = useState(false)
-  const [errorMessage, setErrorMessage] = useState<string | null>(null)
-  const router = useRouter()
-  const supabase = createClient()
 
-  const handleDeleteSemester = async () => {
-    setErrorMessage(null)
+  const handleDelete = () => {
     const confirmed = window.confirm(
       'Are you sure you want to delete this semester and all its courses?'
     )
     if (!confirmed) return
 
     setLoading(true)
-
-    try {
-      const { error } = await supabase
-        .from('semesters')
-        .delete()
-        .eq('id', semesterId)
-
-      if (error) {
-        console.error('Delete semester error:', error)
-        setErrorMessage(error.message)
-      } else {
-        router.push('/dashboard')
-        router.refresh()
-      }
-    } catch (err: unknown) {
-      console.error('Delete semester error:', err)
-      if (err instanceof Error) {
-        setErrorMessage(err.message)
-      } else {
-        setErrorMessage('An unexpected error occurred while deleting the semester.')
-      }
-    } finally {
-      setLoading(false)
-    }
+    onDeleteSemester()
   }
 
   return (
     <div className="flex flex-col items-end gap-1">
       <button
-        onClick={handleDeleteSemester}
+        onClick={handleDelete}
         disabled={loading}
         className="inline-flex items-center gap-1.5 rounded-lg border border-red-800/40 bg-red-950/30 px-3 py-1.5 text-xs font-semibold text-red-400 hover:bg-red-900/50 hover:text-red-300 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50"
       >
@@ -72,12 +43,6 @@ export default function DeleteSemesterButton({
         </svg>
         {loading ? 'Deleting...' : 'Delete Semester'}
       </button>
-
-      {errorMessage && (
-        <p className="text-xs font-medium text-red-400">
-          {errorMessage}
-        </p>
-      )}
     </div>
   )
 }

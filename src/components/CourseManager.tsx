@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
 import { calculateSGPA, GRADE_POINTS, Grade } from '@/lib/grading'
 import CourseCombobox from './CourseCombobox'
 import { CourseDefinition } from '@/data/coursesData'
@@ -11,6 +10,12 @@ export interface CourseItem {
   name: string
   credits: number
   grade: Grade
+}
+
+interface SemesterItem {
+  id: string
+  semester_number: number
+  courses: CourseItem[]
 }
 
 interface CourseManagerProps {
@@ -24,7 +29,7 @@ export default function CourseManager({
   semesterId,
   initialCourses,
 }: CourseManagerProps) {
-  const [courses, setCourses] = useState<CourseItem[]>(initialCourses)
+  const [courses, setCourses] = useState<CourseItem[]>(initialCourses || [])
 
   // Add Form input state
   const [selectedCourse, setSelectedCourse] = useState<CourseDefinition | null>(null)
@@ -57,8 +62,6 @@ export default function CourseManager({
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
-  const supabase = createClient()
-
   // Calculate SGPA on every render from current local courses state
   const currentSGPA = calculateSGPA(
     courses.map((c) => ({
@@ -68,6 +71,25 @@ export default function CourseManager({
     }))
   )
   const totalCredits = courses.reduce((sum, c) => sum + c.credits, 0)
+
+  // Helper to sync changes with localStorage
+  const updateLocalStorage = (updatedCourses: CourseItem[]) => {
+    const saved = localStorage.getItem('iitbbs_semesters')
+    if (saved) {
+      try {
+        const semesters: SemesterItem[] = JSON.parse(saved)
+        const updatedSemesters = semesters.map((sem) => {
+          if (sem.id === semesterId) {
+            return { ...sem, courses: updatedCourses }
+          }
+          return sem
+        })
+        localStorage.setItem('iitbbs_semesters', JSON.stringify(updatedSemesters))
+      } catch (e) {
+        console.error('Error saving updated courses to localStorage:', e)
+      }
+    }
+  }
 
   // Start Editing a row
   const handleStartEdit = (course: CourseItem) => {
@@ -103,41 +125,22 @@ export default function CourseManager({
     setSavingId(id)
 
     try {
-      const { error } = await supabase
-        .from('courses')
-        .update({
-          name: editName.trim(),
-          credits: parsedCredits,
-          grade: editGrade,
-        })
-        .eq('id', id)
-
-      if (error) {
-        console.error('Update course error:', error)
-        setErrorMessage(error.message)
-      } else {
-        // Update local state
-        setCourses((prev) =>
-          prev.map((c) =>
-            c.id === id
-              ? {
-                  ...c,
-                  name: editName.trim(),
-                  credits: parsedCredits,
-                  grade: editGrade,
-                }
-              : c
-          )
-        )
-        setEditingId(null)
-      }
+      const updated = courses.map((c) =>
+        c.id === id
+          ? {
+              ...c,
+              name: editName.trim(),
+              credits: parsedCredits,
+              grade: editGrade,
+            }
+          : c
+      )
+      setCourses(updated)
+      updateLocalStorage(updated)
+      setEditingId(null)
     } catch (err: unknown) {
       console.error('Update course error:', err)
-      if (err instanceof Error) {
-        setErrorMessage(err.message)
-      } else {
-        setErrorMessage('An unexpected error occurred while updating the course.')
-      }
+      setErrorMessage('An unexpected error occurred while updating the course.')
     } finally {
       setSavingId(null)
     }
@@ -160,40 +163,21 @@ export default function CourseManager({
     setIsAdding(true)
 
     try {
-      const { data, error } = await supabase
-        .from('courses')
-        .insert({
-          semester_id: semesterId,
-          name: name.trim(),
-          credits: parsedCredits,
-          grade: grade,
-        })
-        .select('id, name, credits, grade')
-        .single()
-
-      if (error) {
-        console.error('Add course error:', error)
-        setErrorMessage(error.message)
-      } else if (data) {
-        const newCourseItem: CourseItem = {
-          id: data.id,
-          name: data.name,
-          credits: Number(data.credits),
-          grade: data.grade as Grade,
-        }
-        setCourses((prev) => [...prev, newCourseItem])
-        setSelectedCourse(null)
-        setName('')
-        setCredits('3')
-        setGrade('A')
+      const newCourseItem: CourseItem = {
+        id: Math.random().toString(36).substring(2, 9),
+        name: name.trim(),
+        credits: parsedCredits,
+        grade: grade,
       }
+      const updated = [...courses, newCourseItem]
+      setCourses(updated)
+      updateLocalStorage(updated)
+      setName('')
+      setCredits('3')
+      setGrade('A')
     } catch (err: unknown) {
       console.error('Add course error:', err)
-      if (err instanceof Error) {
-        setErrorMessage(err.message)
-      } else {
-        setErrorMessage('An unexpected error occurred while adding the course.')
-      }
+      setErrorMessage('An unexpected error occurred while adding the course.')
     } finally {
       setIsAdding(false)
     }
@@ -204,27 +188,15 @@ export default function CourseManager({
     setDeletingId(id)
 
     try {
-      const { error } = await supabase
-        .from('courses')
-        .delete()
-        .eq('id', id)
-
-      if (error) {
-        console.error('Delete course error:', error)
-        setErrorMessage(error.message)
-      } else {
-        setCourses((prev) => prev.filter((c) => c.id !== id))
-        if (editingId === id) {
-          setEditingId(null)
-        }
+      const updated = courses.filter((c) => c.id !== id)
+      setCourses(updated)
+      updateLocalStorage(updated)
+      if (editingId === id) {
+        setEditingId(null)
       }
     } catch (err: unknown) {
       console.error('Delete course error:', err)
-      if (err instanceof Error) {
-        setErrorMessage(err.message)
-      } else {
-        setErrorMessage('An unexpected error occurred while deleting the course.')
-      }
+      setErrorMessage('An unexpected error occurred while deleting the course.')
     } finally {
       setDeletingId(null)
     }

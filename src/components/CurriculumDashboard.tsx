@@ -162,17 +162,17 @@ export default function CurriculumDashboard({
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
             <div className="flex items-center gap-2">
-              <Award className="h-4 w-4 text-amber-400" />
-              <span className="text-xs font-black uppercase tracking-wider text-amber-400">
+              <Award className="h-4 w-4 text-[var(--color-gold)]" />
+              <span className="text-xs font-black uppercase tracking-wider text-[var(--color-gold)]">
                 Cumulative Grade Point Average
               </span>
-              <span className="rounded-full border-t border-l border-white/40 bg-rose-500/20 px-3.5 py-0.5 text-[10px] font-black text-rose-300 backdrop-blur-md shadow-sm">
+              <span className="rounded-full border border-[var(--color-gold)]/30 bg-[var(--color-gold)]/10 px-3.5 py-0.5 text-[10px] font-black text-[var(--color-gold)] backdrop-blur-md shadow-sm">
                 Branch: {branchId}
               </span>
             </div>
 
             <div className="mt-3 flex items-baseline gap-3">
-              <span className="text-5xl sm:text-6xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-rose-400 via-amber-300 to-cyan-400">
+              <span className="text-5xl sm:text-6xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[var(--color-gold)] via-[var(--color-muted)] to-[var(--color-slate)]">
                 {overallMetrics.overallCGPA > 0 ? overallMetrics.overallCGPA.toFixed(2) : 'N/A'}
               </span>
               <span className="text-base sm:text-xl font-bold text-[var(--text-muted)]">
@@ -198,9 +198,9 @@ export default function CurriculumDashboard({
             <div className="col-span-2 sm:col-span-1">
               <button
                 onClick={handleResetCurriculum}
-                className="inline-flex items-center gap-1.5 rounded-2xl border-t border-l border-white/30 bg-white/10 px-3.5 py-2 text-xs font-extrabold text-[var(--text-muted)] hover:text-red-400 transition-colors mt-2 sm:mt-0"
+                className="inline-flex items-center gap-1.5 rounded-2xl border-t border-l border-white/30 bg-white/10 px-3.5 py-2 text-xs font-extrabold text-[var(--text-muted)] hover:text-[var(--color-gold)] transition-colors mt-2 sm:mt-0"
               >
-                <RotateCcw className="h-3.5 w-3.5 text-rose-400" />
+                <RotateCcw className="h-3.5 w-3.5 text-[var(--color-gold)]" />
                 Change Branch
               </button>
             </div>
@@ -211,11 +211,11 @@ export default function CurriculumDashboard({
         <div className="space-y-2">
           <div className="flex justify-between text-xs font-bold text-[var(--text-muted)]">
             <span>Overall Curriculum Completion</span>
-            <span className="text-amber-400 font-black">{overallMetrics.progressPercentage}%</span>
+            <span className="text-[var(--color-gold)] font-black">{overallMetrics.progressPercentage}%</span>
           </div>
           <div className="h-3.5 w-full overflow-hidden rounded-full bg-slate-950/70 p-0.5 border-t border-l border-white/20 border-r border-b border-white/5">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-rose-500 via-amber-400 to-cyan-400 shadow-lg shadow-rose-500/25 transition-all duration-500"
+              className="h-full rounded-full bg-gradient-to-r from-[var(--color-gold)] via-[var(--color-muted)] to-[var(--color-slate)] shadow-lg shadow-[var(--color-gold)]/20 transition-all duration-500"
               style={{ width: `${overallMetrics.progressPercentage}%` }}
             />
           </div>
@@ -226,8 +226,8 @@ export default function CurriculumDashboard({
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-2xl bg-rose-500/15 border-t border-l border-white/40">
-              <BookOpen className="h-5 w-5 text-rose-400" />
+            <div className="p-2 rounded-2xl bg-[var(--color-gold)]/10 border border-[var(--color-gold)]/20">
+              <BookOpen className="h-5 w-5 text-[var(--color-gold)]" />
             </div>
             <h3 className="text-2xl font-black text-[var(--text-main)] tracking-tight">Curriculum Semesters</h3>
           </div>
@@ -251,7 +251,7 @@ export default function CurriculumDashboard({
                       <h4 className="text-xl font-black text-[var(--text-main)]">
                         Semester {sem.semester_number}
                       </h4>
-                      <span className="rounded-xl border-t border-l border-white/40 bg-gradient-to-r from-amber-500/20 to-rose-500/20 px-3 py-1 text-xs font-black text-amber-300 backdrop-blur-md shadow-sm">
+                      <span className="rounded-xl border border-[var(--color-gold)]/20 bg-[var(--color-gold)]/10 px-3 py-1 text-xs font-black text-[var(--color-gold)] backdrop-blur-md shadow-sm">
                         SGPA: {sem.sgpa > 0 ? sem.sgpa.toFixed(2) : 'N/A'}
                       </span>
                     </div>
@@ -274,11 +274,11 @@ export default function CurriculumDashboard({
                     <div className="hidden sm:block w-40 space-y-1.5">
                       <div className="flex justify-between text-[11px] font-black text-[var(--text-muted)]">
                         <span>Progress</span>
-                        <span className="text-amber-400">{semProgress}%</span>
+                        <span className="text-[var(--color-gold)]">{semProgress}%</span>
                       </div>
                       <div className="h-2.5 w-full overflow-hidden rounded-full bg-slate-950/70 border-t border-l border-white/20">
                         <div
-                          className="h-full rounded-full bg-gradient-to-r from-amber-400 to-cyan-400 transition-all duration-300"
+                          className="h-full rounded-full bg-gradient-to-r from-[var(--color-gold)] to-[var(--color-slate)] transition-all duration-300"
                           style={{ width: `${semProgress}%` }}
                         />
                       </div>
@@ -317,8 +317,8 @@ export default function CurriculumDashboard({
                                   <Edit3 className="h-3 w-3 text-purple-300" /> Custom
                                 </span>
                               ) : (
-                                <span className="inline-flex items-center gap-1 rounded-xl bg-cyan-500/15 border-t border-l border-white/30 px-2.5 py-0.5 text-[10px] font-bold text-cyan-300">
-                                  <CheckCircle2 className="h-3 w-3 text-cyan-400" /> Curriculum
+                                <span className="inline-flex items-center gap-1 rounded-xl bg-[var(--color-gold)]/10 border border-[var(--color-gold)]/20 px-2.5 py-0.5 text-[10px] font-bold text-[var(--color-gold)]">
+                                  <CheckCircle2 className="h-3 w-3 text-[var(--color-gold)]" /> Curriculum
                                 </span>
                               )}
                             </td>
