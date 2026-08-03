@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { initializeLocalCurriculum } from '@/lib/storage'
 
 interface Building {
   id: string
@@ -153,10 +154,11 @@ export function LandingHero({ isLoggedIn }: LandingHeroProps) {
     }
   }, [activeIndex])
 
-  const handleNavigate = (branch: string) => {
-    setLoadingBranch(branch)
+  const handleNavigate = (branchId: string, label: string) => {
+    setLoadingBranch(label)
+    initializeLocalCurriculum(branchId)
     setTimeout(() => {
-      router.push(`/calculator/${branch}`)
+      router.push('/dashboard')
     }, 450)
   }
 
@@ -250,7 +252,7 @@ export function LandingHero({ isLoggedIn }: LandingHeroProps) {
               }}
             >
               <button
-                onClick={() => handleNavigate('mechanical')}
+                onClick={() => handleNavigate('ME', 'mechanical')}
                 disabled={!!loadingBranch}
                 className="inline-flex items-center gap-2 text-xs font-bold text-slate-950 bg-amber-400 hover:bg-amber-300 px-5 py-2.5 rounded-full shadow-lg shadow-amber-400/10 hover:shadow-amber-400/25 transition-all duration-300 hover:-translate-y-0.5 active:scale-95 disabled:opacity-50"
               >
@@ -293,7 +295,7 @@ export function LandingHero({ isLoggedIn }: LandingHeroProps) {
 
                   {/* Option 1: CSE */}
                   <button
-                    onClick={() => handleNavigate('cse')}
+                    onClick={() => handleNavigate('CS', 'cse')}
                     disabled={!!loadingBranch}
                     className={`px-3.5 py-2 rounded-full text-xs font-bold transition-all duration-300 active:scale-95 flex items-center gap-1.5 ${
                       loadingBranch === 'cse'
@@ -308,7 +310,7 @@ export function LandingHero({ isLoggedIn }: LandingHeroProps) {
 
                   {/* Option 2: EE */}
                   <button
-                    onClick={() => handleNavigate('ee')}
+                    onClick={() => handleNavigate('EE', 'ee')}
                     disabled={!!loadingBranch}
                     className={`px-3.5 py-2 rounded-full text-xs font-bold transition-all duration-300 active:scale-95 flex items-center gap-1.5 ${
                       loadingBranch === 'ee'
@@ -323,7 +325,7 @@ export function LandingHero({ isLoggedIn }: LandingHeroProps) {
 
                   {/* Option 3: ECE */}
                   <button
-                    onClick={() => handleNavigate('ece')}
+                    onClick={() => handleNavigate('ECE', 'ece')}
                     disabled={!!loadingBranch}
                     className={`px-3.5 py-2 rounded-full text-xs font-bold transition-all duration-300 active:scale-95 flex items-center gap-1.5 ${
                       loadingBranch === 'ece'
@@ -349,7 +351,7 @@ export function LandingHero({ isLoggedIn }: LandingHeroProps) {
               }}
             >
               <button
-                onClick={() => handleNavigate('civil')}
+                onClick={() => handleNavigate('CE', 'civil')}
                 disabled={!!loadingBranch}
                 className="inline-flex items-center gap-2 text-xs font-bold text-slate-950 bg-amber-400 hover:bg-amber-300 px-5 py-2.5 rounded-full shadow-lg shadow-amber-400/10 hover:shadow-amber-400/25 transition-all duration-300 hover:-translate-y-0.5 active:scale-95 disabled:opacity-50"
               >
@@ -371,7 +373,7 @@ export function LandingHero({ isLoggedIn }: LandingHeroProps) {
               }}
             >
               <button
-                onClick={() => handleNavigate('metallurgy')}
+                onClick={() => handleNavigate('MM', 'metallurgy')}
                 disabled={!!loadingBranch}
                 className="inline-flex items-center gap-2 text-xs font-bold text-slate-950 bg-amber-400 hover:bg-amber-300 px-5 py-2.5 rounded-full shadow-lg shadow-amber-400/10 hover:shadow-amber-400/25 transition-all duration-300 hover:-translate-y-0.5 active:scale-95 disabled:opacity-50"
               >
