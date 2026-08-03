@@ -1,113 +1,318 @@
 'use client'
 
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
+
+interface Building {
+  id: string
+  name: string
+  label: string
+  image: string
+  mobilePosition: string
+}
+
+const BUILDINGS: Building[] = [
+  {
+    id: 'admin',
+    name: 'Admin Building',
+    label: 'ADMIN BUILDING',
+    image: '/Images/hero-admin.jpg',
+    mobilePosition: '50% bottom',
+  },
+  {
+    id: 'sms',
+    name: 'School of Mechanical Sciences',
+    label: 'SCHOOL OF MECHANICAL SCIENCES',
+    image: '/Images/hero-sms.jpg',
+    mobilePosition: '50% bottom',
+  },
+  {
+    id: 'secs',
+    name: 'School of Electrical & Computer Sciences',
+    label: 'SCHOOL OF ELECTRICAL & COMPUTER SCIENCES',
+    image: '/Images/hero-secs.jpg',
+    mobilePosition: '50% bottom',
+  },
+  {
+    id: 'sif',
+    name: 'School of Infrastructure',
+    label: 'SCHOOL OF INFRASTRUCTURE',
+    image: '/Images/hero-sif.jpg',
+    mobilePosition: '50% bottom',
+  },
+  {
+    id: 'smmme',
+    name: 'School of Minerals, Metallurgical & Materials Engineering',
+    label: 'SCHOOL OF MINERALS, METALLURGICAL & MATERIALS ENG.',
+    image: '/Images/hero-smmme.jpg',
+    mobilePosition: '50% bottom',
+  },
+]
 
 interface LandingHeroProps {
   isLoggedIn: boolean
 }
 
 export function LandingHero({ isLoggedIn }: LandingHeroProps) {
+  const [progress, setProgress] = useState(0)
+  const wrapperRef = useRef<HTMLDivElement>(null)
+
+  // 1. Preload images on mount to avoid loading flickers
+  useEffect(() => {
+    BUILDINGS.forEach((b) => {
+      const img = new Image()
+      img.src = b.image
+    })
+  }, [])
+
+  // 2. Add scroll and resize listeners to calculate scroll progress
+  useEffect(() => {
+    let activeFrameId: number | null = null
+
+    const handleScroll = () => {
+      if (activeFrameId !== null) return
+
+      activeFrameId = requestAnimationFrame(() => {
+        const wrapper = wrapperRef.current
+        if (wrapper) {
+          const rect = wrapper.getBoundingClientRect()
+          const totalScrollableHeight = rect.height - window.innerHeight
+          
+          // Clamp progress between 0 and 1
+          const scrolled = -rect.top
+          const currentProgress = Math.max(0, Math.min(1, scrolled / totalScrollableHeight))
+          setProgress(currentProgress)
+        }
+        activeFrameId = null
+      })
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    window.addEventListener('resize', handleScroll, { passive: true })
+    
+    // Set initial progress
+    handleScroll()
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+      window.removeEventListener('resize', handleScroll)
+      if (activeFrameId !== null) {
+        cancelAnimationFrame(activeFrameId)
+      }
+    }
+  }, [])
+
+  // 3. Mathematical cross-fade opacity calculator
+  const getOpacity = (index: number, p: number) => {
+    const count = BUILDINGS.length
+    if (count <= 1) return index === 0 ? 1 : 0
+
+    const targetProgress = index / (count - 1)
+    const segmentWidth = 1 / (count - 1)
+    const distance = Math.abs(p - targetProgress)
+
+    if (distance < segmentWidth) {
+      return 1 - distance / segmentWidth
+    }
+    return 0
+  }
+
+  // 4. Smooth scrolling action for progress dots navigation
+  const scrollToBuilding = (index: number) => {
+    const wrapper = wrapperRef.current
+    if (!wrapper) return
+
+    const rect = wrapper.getBoundingClientRect()
+    const totalHeight = rect.height
+    const targetProgress = index / (BUILDINGS.length - 1)
+    const totalScrollableHeight = totalHeight - window.innerHeight
+
+    // Calculate absolute scroll position on the page
+    const absoluteScrollY = window.scrollY + rect.top + targetProgress * totalScrollableHeight
+
+    window.scrollTo({
+      top: absoluteScrollY,
+      behavior: 'smooth',
+    })
+  }
+
+  // Determine active building index for navigation dots and tooltips
+  const activeIndex = Math.min(
+    BUILDINGS.length - 1,
+    Math.round(progress * (BUILDINGS.length - 1))
+  )
+
   return (
-    <section 
-      className="relative min-h-screen w-full flex flex-col justify-between overflow-hidden bg-cover bg-no-repeat transition-all duration-500 hero-bg-adjust"
-      style={{
-        backgroundImage: `linear-gradient(to bottom, rgba(10, 15, 30, 0.85) 0%, rgba(10, 15, 30, 0.4) 50%, rgba(10, 15, 30, 0.95) 100%), url('/Images/iitbbs.jpg')`,
-      }}
-    >
-      {/* Navbar/Header */}
-      <header className="w-full max-w-7xl mx-auto px-6 py-6 flex items-center justify-between z-20 relative">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/25">
-            <svg className="w-5 h-5 text-slate-950 font-bold" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 11h.01M12 7h.01M15 11h.01M12 14h.01M4 6h16a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2z" />
+    <div ref={wrapperRef} className="hero-wrapper-scroll">
+      <div className="hero-sticky-container">
+        {/* Background cross-fading layers */}
+        <div className="absolute inset-0 z-0">
+          {BUILDINGS.map((b, idx) => {
+            const opacity = getOpacity(idx, progress)
+            return (
+              <div
+                key={b.id}
+                className="hero-bg-layer"
+                style={{
+                  backgroundImage: `linear-gradient(to bottom, rgba(10, 15, 30, 0.85) 0%, rgba(10, 15, 30, 0.4) 50%, rgba(10, 15, 30, 0.95) 100%), url('${b.image}')`,
+                  opacity,
+                  // Keep layers with 0 opacity unclickable and hidden from layout rendering
+                  visibility: opacity > 0.01 ? 'visible' : 'hidden',
+                  pointerEvents: opacity > 0.01 ? 'auto' : 'none',
+                }}
+              />
+            )
+          })}
+        </div>
+
+        {/* Navbar/Header */}
+        <header className="w-full max-w-7xl mx-auto px-6 py-6 flex items-center justify-between z-20 relative">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/25">
+              <svg className="w-5 h-5 text-slate-950 font-bold" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 11h.01M12 7h.01M15 11h.01M12 14h.01M4 6h16a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2z" />
+              </svg>
+            </div>
+            <div>
+              <span className="font-bold text-lg text-white tracking-tight block leading-none">IITBBS</span>
+              <span className="text-[10px] font-mono tracking-widest text-amber-400 uppercase">CGPA Predictor</span>
+            </div>
+          </div>
+          
+          <div>
+            {isLoggedIn ? (
+              <Link
+                href="/dashboard"
+                className="text-sm font-semibold text-white bg-slate-900/60 hover:bg-slate-800/80 px-5 py-2.5 rounded-full border border-slate-700/50 hover:border-slate-500/55 transition-all duration-300 backdrop-blur-md shadow-sm"
+              >
+                Go to Dashboard
+              </Link>
+            ) : (
+              <Link
+                href="/login"
+                className="text-sm font-semibold text-white bg-slate-900/60 hover:bg-slate-800/80 px-5 py-2.5 rounded-full border border-slate-700/50 hover:border-slate-500/55 transition-all duration-300 backdrop-blur-md shadow-sm"
+              >
+                Sign In
+              </Link>
+            )}
+          </div>
+        </header>
+
+        {/* Monospace Building/School Name Label (Positioned top-left, cross-fades in sync) */}
+        <div className="absolute top-[88px] left-6 md:left-12 z-20 w-[calc(100%-3rem)] md:w-auto">
+          <div className="relative h-12 w-full md:w-[480px]">
+            {BUILDINGS.map((b, idx) => {
+              const opacity = getOpacity(idx, progress)
+              return (
+                <span
+                  key={b.id}
+                  className="absolute left-0 top-0 font-mono tracking-[0.2em] text-[11px] md:text-xs font-bold uppercase text-amber-400 transition-all duration-150 ease-out block leading-relaxed"
+                  style={{
+                    opacity,
+                    transform: `translateX(${(1 - opacity) * -12}px)`,
+                    pointerEvents: opacity > 0.05 ? 'auto' : 'none',
+                    visibility: opacity > 0.05 ? 'visible' : 'hidden',
+                  }}
+                >
+                  [ {b.label} ]
+                </span>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* Persistent Main Content Area */}
+        <div className="flex-1 flex flex-col items-center justify-start pt-[14vh] md:pt-[18vh] px-6 max-w-4xl mx-auto text-center z-10 relative">
+          {/* Headline */}
+          <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold text-white tracking-tight leading-[1.1] mb-6 max-w-3xl drop-shadow-lg">
+            Predict Your CGPA <br className="hidden sm:inline" />
+            <span className="bg-gradient-to-r from-amber-200 via-amber-400 to-amber-200 bg-clip-text text-transparent">
+              Before It&apos;s Final
+            </span>
+          </h1>
+
+          {/* Subheadline */}
+          <p className="text-sm sm:text-base md:text-lg text-slate-200 max-w-2xl font-normal mb-10 leading-relaxed px-2 drop-shadow-md">
+            Enter your grades, get instant CGPA projections tailored to your curriculum.
+          </p>
+
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center w-full max-w-xs sm:max-w-none">
+            {isLoggedIn ? (
+              <Link
+                href="/dashboard"
+                className="w-full sm:w-auto bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 font-bold px-8 py-4 rounded-full shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40 hover:-translate-y-0.5 transition-all duration-300 transform text-base focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-slate-900 text-center"
+              >
+                Go to Dashboard
+              </Link>
+            ) : (
+              <Link
+                href="/login"
+                className="w-full sm:w-auto bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 font-bold px-8 py-4 rounded-full shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40 hover:-translate-y-0.5 transition-all duration-300 transform text-base focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-slate-900 text-center"
+              >
+                Calculate Now
+              </Link>
+            )}
+
+            <Link
+              href="/login?signup=true"
+              className="w-full sm:w-auto text-slate-300 hover:text-white font-medium px-8 py-4 rounded-full border border-slate-700 hover:border-slate-500 bg-slate-950/40 hover:bg-slate-950/70 backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 text-center text-base"
+            >
+              How it works ↓
+            </Link>
+          </div>
+        </div>
+
+        {/* Right-aligned Vertical 5-Dot Navigation Indicator */}
+        <div className="fixed right-6 md:right-8 top-1/2 transform -translate-y-1/2 flex flex-col gap-5 z-30">
+          {BUILDINGS.map((b, idx) => {
+            const isActive = idx === activeIndex
+            return (
+              <button
+                key={b.id}
+                onClick={() => scrollToBuilding(idx)}
+                className="group relative flex items-center justify-end focus:outline-none"
+                aria-label={`Scroll to ${b.name}`}
+              >
+                {/* Custom Glass Tooltip on Hover */}
+                <span className="absolute right-8 bg-slate-950/90 text-white text-[10px] font-mono tracking-wider uppercase px-2.5 py-1.5 rounded-lg border border-slate-700/60 opacity-0 group-hover:opacity-100 transition-all duration-200 transform translate-x-2 group-hover:translate-x-0 pointer-events-none whitespace-nowrap shadow-xl">
+                  {b.name}
+                </span>
+                
+                {/* Visual Dot */}
+                <div 
+                  className={`w-3 h-3 rounded-full transition-all duration-300 border ${
+                    isActive 
+                      ? 'bg-amber-400 border-amber-300 scale-125 shadow-[0_0_12px_rgba(251,191,36,0.6)]' 
+                      : 'bg-slate-700/60 border-slate-600 hover:bg-slate-400 scale-100'
+                  }`}
+                />
+              </button>
+            )
+          })}
+        </div>
+
+        {/* Scroll indicator (fades out as user scrolls) */}
+        <div 
+          className="w-full pb-8 flex flex-col items-center justify-end z-10 relative transition-opacity duration-300"
+          style={{
+            opacity: Math.max(0, 1 - progress * 5),
+            pointerEvents: progress > 0.2 ? 'none' : 'auto',
+          }}
+        >
+          <div 
+            onClick={() => scrollToBuilding(1)}
+            className="flex flex-col items-center gap-2 cursor-pointer opacity-70 hover:opacity-100 transition-opacity duration-300 group"
+          >
+            <span className="text-[10px] font-mono tracking-widest text-slate-400 uppercase group-hover:text-amber-400 transition-colors">
+              Scroll to explore buildings
+            </span>
+            <svg className="w-5 h-5 text-amber-400 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
             </svg>
           </div>
-          <div>
-            <span className="font-bold text-lg text-white tracking-tight block leading-none">IITBBS</span>
-            <span className="text-[10px] font-mono tracking-widest text-amber-400 uppercase">CGPA Predictor</span>
-          </div>
-        </div>
-        
-        <div>
-          {isLoggedIn ? (
-            <Link
-              href="/dashboard"
-              className="text-sm font-semibold text-white bg-slate-900/60 hover:bg-slate-800/80 px-5 py-2.5 rounded-full border border-slate-700/50 hover:border-slate-500/55 transition-all duration-300 backdrop-blur-md shadow-sm"
-            >
-              Go to Dashboard
-            </Link>
-          ) : (
-            <Link
-              href="/login"
-              className="text-sm font-semibold text-white bg-slate-900/60 hover:bg-slate-800/80 px-5 py-2.5 rounded-full border border-slate-700/50 hover:border-slate-500/55 transition-all duration-300 backdrop-blur-md shadow-sm"
-            >
-              Sign In
-            </Link>
-          )}
-        </div>
-      </header>
-
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col items-center justify-start pt-[10vh] md:pt-[15vh] px-6 max-w-4xl mx-auto text-center z-10 relative">
-        {/* Eyebrow Label */}
-        <span className="font-mono tracking-[0.25em] text-xs md:text-sm font-bold uppercase text-amber-400 mb-4 animate-fade-in-up">
-          [ IIT BHUBANESWAR ]
-        </span>
-
-        {/* Headline */}
-        <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold text-white tracking-tight leading-[1.1] mb-6 animate-fade-in-up animation-delay-100 max-w-3xl">
-          Predict Your CGPA <br className="hidden sm:inline" />
-          <span className="bg-gradient-to-r from-amber-200 via-amber-400 to-amber-200 bg-clip-text text-transparent drop-shadow-sm">
-            Before It&apos;s Final
-          </span>
-        </h1>
-
-        {/* Subheadline */}
-        <p className="text-sm sm:text-base md:text-lg text-slate-300 max-w-2xl font-normal mb-10 leading-relaxed animate-fade-in-up animation-delay-200 px-2">
-          Enter your grades, get instant CGPA projections tailored to your curriculum.
-        </p>
-
-        {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center w-full max-w-xs sm:max-w-none animate-fade-in-up animation-delay-300">
-          {isLoggedIn ? (
-            <Link
-              href="/dashboard"
-              className="w-full sm:w-auto bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 font-bold px-8 py-4 rounded-full shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40 hover:-translate-y-0.5 transition-all duration-300 transform text-base focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-slate-900 text-center"
-            >
-              Go to Dashboard
-            </Link>
-          ) : (
-            <Link
-              href="/login"
-              className="w-full sm:w-auto bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 font-bold px-8 py-4 rounded-full shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40 hover:-translate-y-0.5 transition-all duration-300 transform text-base focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-slate-900 text-center"
-            >
-              Calculate Now
-            </Link>
-          )}
-
-          <Link
-            href="/login?signup=true"
-            className="w-full sm:w-auto text-slate-300 hover:text-white font-medium px-8 py-4 rounded-full border border-slate-700 hover:border-slate-500 bg-slate-950/40 hover:bg-slate-950/70 backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 text-center text-base"
-          >
-            How it works ↓
-          </Link>
         </div>
       </div>
-
-      {/* Scroll indicator & Bottom Section */}
-      <div className="w-full pb-8 flex flex-col items-center justify-end z-10 relative">
-        <a 
-          href="#features"
-          className="flex flex-col items-center gap-2 cursor-pointer opacity-70 hover:opacity-100 transition-opacity duration-300 group"
-        >
-          <span className="text-[10px] font-mono tracking-widest text-slate-400 uppercase group-hover:text-amber-400 transition-colors">
-            Scroll to explore
-          </span>
-          <svg className="w-5 h-5 text-amber-400 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-          </svg>
-        </a>
-      </div>
-    </section>
+    </div>
   )
 }
