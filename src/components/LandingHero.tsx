@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 interface Building {
   id: string
@@ -54,8 +55,11 @@ interface LandingHeroProps {
 }
 
 export function LandingHero({ isLoggedIn }: LandingHeroProps) {
+  const router = useRouter()
   const [progress, setProgress] = useState(0)
   const wrapperRef = useRef<HTMLDivElement>(null)
+  const [secsExpanded, setSecsExpanded] = useState(false)
+  const [loadingBranch, setLoadingBranch] = useState<string | null>(null)
 
   // 1. Preload images on mount to avoid loading flickers
   useEffect(() => {
@@ -142,6 +146,20 @@ export function LandingHero({ isLoggedIn }: LandingHeroProps) {
     Math.round(progress * (BUILDINGS.length - 1))
   )
 
+  // Collapse SECS sub-menu if active index changes
+  useEffect(() => {
+    if (activeIndex !== 2) {
+      setSecsExpanded(false)
+    }
+  }, [activeIndex])
+
+  const handleNavigate = (branch: string) => {
+    setLoadingBranch(branch)
+    setTimeout(() => {
+      router.push(`/calculator/${branch}`)
+    }, 450)
+  }
+
   return (
     <div ref={wrapperRef} className="hero-wrapper-scroll">
       <div className="hero-sticky-container">
@@ -200,7 +218,7 @@ export function LandingHero({ isLoggedIn }: LandingHeroProps) {
 
         {/* Monospace Building/School Name Label (Positioned top-left, cross-fades in sync) */}
         <div className="absolute top-[88px] left-6 md:left-12 z-20 w-[calc(100%-3rem)] md:w-auto">
-          <div className="relative h-12 w-full md:w-[480px]">
+          <div className="relative h-10 w-full md:w-[480px]">
             {BUILDINGS.map((b, idx) => {
               const opacity = getOpacity(idx, progress)
               return (
@@ -218,6 +236,152 @@ export function LandingHero({ isLoggedIn }: LandingHeroProps) {
                 </span>
               )
             })}
+          </div>
+
+          {/* Interactive School Branch Actions Container */}
+          <div className="mt-3 md:mt-2 min-h-[50px] relative w-full md:w-[480px]">
+            {/* SMS Selection */}
+            <div 
+              className="absolute left-0 top-0 transition-all duration-300"
+              style={{
+                opacity: getOpacity(1, progress),
+                visibility: getOpacity(1, progress) > 0.05 ? 'visible' : 'hidden',
+                pointerEvents: getOpacity(1, progress) > 0.05 ? 'auto' : 'none',
+              }}
+            >
+              <button
+                onClick={() => handleNavigate('mechanical')}
+                disabled={!!loadingBranch}
+                className="inline-flex items-center gap-2 text-xs font-bold text-slate-950 bg-amber-400 hover:bg-amber-300 px-5 py-2.5 rounded-full shadow-lg shadow-amber-400/10 hover:shadow-amber-400/25 transition-all duration-300 hover:-translate-y-0.5 active:scale-95 disabled:opacity-50"
+              >
+                {loadingBranch === 'mechanical' ? (
+                  <span className="flex items-center gap-1.5"><span className="w-3.5 h-3.5 border-2 border-slate-950 border-t-transparent animate-spin rounded-full"></span>Loading...</span>
+                ) : (
+                  'Select This Branch'
+                )}
+              </button>
+            </div>
+
+            {/* SECS Selection */}
+            <div 
+              className="absolute left-0 top-0 transition-all duration-300 flex items-center gap-3"
+              style={{
+                opacity: getOpacity(2, progress),
+                visibility: getOpacity(2, progress) > 0.05 ? 'visible' : 'hidden',
+                pointerEvents: getOpacity(2, progress) > 0.05 ? 'auto' : 'none',
+              }}
+            >
+              {!secsExpanded ? (
+                <button
+                  onClick={() => setSecsExpanded(true)}
+                  className="inline-flex items-center gap-2 text-xs font-bold text-slate-950 bg-amber-400 hover:bg-amber-300 px-5 py-2.5 rounded-full shadow-lg shadow-amber-400/10 hover:shadow-amber-400/25 transition-all duration-300 hover:-translate-y-0.5 active:scale-95"
+                >
+                  Select This School &rarr;
+                </button>
+              ) : (
+                <div className="flex items-center gap-2 md:gap-3 bg-slate-950/80 p-2 md:p-2.5 rounded-2xl border border-slate-800/80 backdrop-blur-md shadow-2xl animate-fade-in-up">
+                  {/* Close / Collapse button */}
+                  <button
+                    onClick={() => setSecsExpanded(false)}
+                    className="p-1.5 rounded-full hover:bg-slate-800 text-slate-400 hover:text-white transition-colors"
+                    aria-label="Back"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" />
+                    </svg>
+                  </button>
+
+                  {/* Option 1: CSE */}
+                  <button
+                    onClick={() => handleNavigate('cse')}
+                    disabled={!!loadingBranch}
+                    className={`px-3.5 py-2 rounded-full text-xs font-bold transition-all duration-300 active:scale-95 flex items-center gap-1.5 ${
+                      loadingBranch === 'cse'
+                        ? 'bg-amber-300 text-slate-950 scale-105 shadow-md shadow-amber-400/20'
+                        : 'bg-slate-900 border border-slate-700/60 text-amber-400 hover:bg-amber-400 hover:text-slate-950 hover:border-amber-400'
+                    }`}
+                    style={{ transitionDelay: '0ms' }}
+                  >
+                    {loadingBranch === 'cse' && <span className="w-3 h-3 border-2 border-slate-950 border-t-transparent animate-spin rounded-full"></span>}
+                    CSE
+                  </button>
+
+                  {/* Option 2: EE */}
+                  <button
+                    onClick={() => handleNavigate('ee')}
+                    disabled={!!loadingBranch}
+                    className={`px-3.5 py-2 rounded-full text-xs font-bold transition-all duration-300 active:scale-95 flex items-center gap-1.5 ${
+                      loadingBranch === 'ee'
+                        ? 'bg-amber-300 text-slate-950 scale-105 shadow-md shadow-amber-400/20'
+                        : 'bg-slate-900 border border-slate-700/60 text-amber-400 hover:bg-amber-400 hover:text-slate-950 hover:border-amber-400'
+                    }`}
+                    style={{ transitionDelay: '80ms' }}
+                  >
+                    {loadingBranch === 'ee' && <span className="w-3 h-3 border-2 border-slate-950 border-t-transparent animate-spin rounded-full"></span>}
+                    EE
+                  </button>
+
+                  {/* Option 3: ECE */}
+                  <button
+                    onClick={() => handleNavigate('ece')}
+                    disabled={!!loadingBranch}
+                    className={`px-3.5 py-2 rounded-full text-xs font-bold transition-all duration-300 active:scale-95 flex items-center gap-1.5 ${
+                      loadingBranch === 'ece'
+                        ? 'bg-amber-300 text-slate-950 scale-105 shadow-md shadow-amber-400/20'
+                        : 'bg-slate-900 border border-slate-700/60 text-amber-400 hover:bg-amber-400 hover:text-slate-950 hover:border-amber-400'
+                    }`}
+                    style={{ transitionDelay: '160ms' }}
+                  >
+                    {loadingBranch === 'ece' && <span className="w-3 h-3 border-2 border-slate-950 border-t-transparent animate-spin rounded-full"></span>}
+                    ECE
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* SIF Selection */}
+            <div 
+              className="absolute left-0 top-0 transition-all duration-300"
+              style={{
+                opacity: getOpacity(3, progress),
+                visibility: getOpacity(3, progress) > 0.05 ? 'visible' : 'hidden',
+                pointerEvents: getOpacity(3, progress) > 0.05 ? 'auto' : 'none',
+              }}
+            >
+              <button
+                onClick={() => handleNavigate('civil')}
+                disabled={!!loadingBranch}
+                className="inline-flex items-center gap-2 text-xs font-bold text-slate-950 bg-amber-400 hover:bg-amber-300 px-5 py-2.5 rounded-full shadow-lg shadow-amber-400/10 hover:shadow-amber-400/25 transition-all duration-300 hover:-translate-y-0.5 active:scale-95 disabled:opacity-50"
+              >
+                {loadingBranch === 'civil' ? (
+                  <span className="flex items-center gap-1.5"><span className="w-3.5 h-3.5 border-2 border-slate-950 border-t-transparent animate-spin rounded-full"></span>Loading...</span>
+                ) : (
+                  'Select This Branch'
+                )}
+              </button>
+            </div>
+
+            {/* SMMME Selection */}
+            <div 
+              className="absolute left-0 top-0 transition-all duration-300"
+              style={{
+                opacity: getOpacity(4, progress),
+                visibility: getOpacity(4, progress) > 0.05 ? 'visible' : 'hidden',
+                pointerEvents: getOpacity(4, progress) > 0.05 ? 'auto' : 'none',
+              }}
+            >
+              <button
+                onClick={() => handleNavigate('metallurgy')}
+                disabled={!!loadingBranch}
+                className="inline-flex items-center gap-2 text-xs font-bold text-slate-950 bg-amber-400 hover:bg-amber-300 px-5 py-2.5 rounded-full shadow-lg shadow-amber-400/10 hover:shadow-amber-400/25 transition-all duration-300 hover:-translate-y-0.5 active:scale-95 disabled:opacity-50"
+              >
+                {loadingBranch === 'metallurgy' ? (
+                  <span className="flex items-center gap-1.5"><span className="w-3.5 h-3.5 border-2 border-slate-950 border-t-transparent animate-spin rounded-full"></span>Loading...</span>
+                ) : (
+                  'Select This Branch'
+                )}
+              </button>
+            </div>
           </div>
         </div>
 
