@@ -1,15 +1,11 @@
-import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+import { LandingHero } from '@/components/LandingHero'
 
-export default async function HomePage() {
-  const supabase = createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (user) {
-    redirect('/dashboard')
-  } else {
-    redirect('/login')
-  }
+export default function HomePage() {
+  return (
+    <main className="min-h-screen bg-slate-950 text-white">
+      <LandingHero isLoggedIn={true} />
+    </main>
+  )
 }
+
+

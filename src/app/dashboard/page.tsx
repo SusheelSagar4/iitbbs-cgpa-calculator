@@ -1,58 +1,61 @@
+'use client'
+
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/server'
 import { calculateSGPA, calculateCGPA, Course, Grade } from '@/lib/grading'
 import AddSemesterButton from '@/components/AddSemesterButton'
 
-interface RawCourse {
+export interface CourseItem {
   id: string
   name: string
   credits: number
-  grade: string
+  grade: Grade
 }
 
-interface RawSemester {
+export interface SemesterItem {
   id: string
   semester_number: number
-  courses: RawCourse[]
+  courses: CourseItem[]
 }
 
-export default async function DashboardPage() {
-  const supabase = createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+export default function DashboardPage() {
+  const [semesters, setSemesters] = useState<SemesterItem[]>([])
+  const [isMounted, setIsMounted] = useState(false)
 
-  if (!user) return null
+  // Load semesters from localStorage on client mount
+  useEffect(() => {
+    const saved = localStorage.getItem('iitbbs_semesters')
+    if (saved) {
+      try {
+        setSemesters(JSON.parse(saved))
+      } catch (e) {
+        console.error('Error parsing semesters from localStorage:', e)
+      }
+    }
+    setIsMounted(true)
+  }, [])
 
-  // Fetch semesters for logged in user ordered by semester_number ascending with their courses
-  const { data: semestersData, error } = await supabase
-    .from('semesters')
-    .select(`
-      id,
-      semester_number,
-      courses (
-        id,
-        name,
-        credits,
-        grade
-      )
-    `)
-    .eq('user_id', user.id)
-    .order('semester_number', { ascending: true })
-
-  if (error) {
-    console.error('Error fetching semesters:', error.message)
+  const saveSemesters = (updated: SemesterItem[]) => {
+    setSemesters(updated)
+    localStorage.setItem('iitbbs_semesters', JSON.stringify(updated))
   }
 
-  const semesters = (semestersData as unknown as RawSemester[]) || []
+  const handleAddSemester = () => {
+    const maxSem = semesters.reduce((max, s) => Math.max(max, s.semester_number), 0)
+    const newSem: SemesterItem = {
+      id: Math.random().toString(36).substring(2, 9),
+      semester_number: maxSem + 1,
+      courses: [],
+    }
+    saveSemesters([...semesters, newSem])
+  }
 
   // Compute SGPA & total credits for each semester
   const processedSemesters = semesters.map((sem) => {
-    const rawCourses = sem.courses || []
-    const courses: Course[] = rawCourses.map((c) => ({
+    const courses: Course[] = sem.courses.map((c) => ({
       name: c.name,
       credits: Number(c.credits),
-      grade: c.grade as Grade,
+      grade: c.grade,
     }))
 
     const sgpa = calculateSGPA(courses)
@@ -73,13 +76,17 @@ export default async function DashboardPage() {
     totalCredits: s.totalCredits,
   }))
   const overallCGPA = calculateCGPA(cgpaData)
-  const maxSemesterNumber = semesters.reduce(
-    (max, s) => Math.max(max, s.semester_number),
-    0
-  )
+
+  if (!isMounted) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-t-teal-500 border-slate-700"></div>
+      </div>
+    )
+  }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 animate-fade-in-up">
       {/* Top Banner Card for Overall CGPA */}
       <div className="relative overflow-hidden rounded-2xl border border-slate-800 bg-gradient-to-br from-slate-900 via-slate-900/90 to-teal-950/40 p-6 sm:p-8 shadow-xl">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -119,8 +126,7 @@ export default async function DashboardPage() {
           <p className="text-sm text-slate-400">View and manage your academic performance across semesters</p>
         </div>
         <AddSemesterButton
-          currentMaxSemesterNumber={maxSemesterNumber}
-          userId={user.id}
+          onAddSemester={handleAddSemester}
         />
       </div>
 
