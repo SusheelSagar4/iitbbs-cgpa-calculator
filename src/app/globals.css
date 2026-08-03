@@ -2,26 +2,189 @@
 @tailwind components;
 @tailwind utilities;
 
+/* VisionOS & Sunset Glassmorphism Design System Variables */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg-main: #060919;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --vision-glass-bg: rgba(15, 23, 42, 0.45);
+  --vision-glass-border-top: rgba(255, 255, 255, 0.35);
+  --vision-glass-border-bottom: rgba(255, 255, 255, 0.08);
+  --vision-glass-panel-bg: rgba(6, 12, 28, 0.75);
+  --vision-glass-shadow: 0 30px 80px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.25);
+  --glass-input-bg: rgba(15, 23, 42, 0.5);
+  --glass-input-border: rgba(255, 255, 255, 0.15);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+.light {
+  --bg-main: #e2e8f0;
+  --text-main: #0f172a;
+  --text-muted: #475569;
+  --vision-glass-bg: rgba(255, 255, 255, 0.65);
+  --vision-glass-border-top: rgba(255, 255, 255, 0.9);
+  --vision-glass-border-bottom: rgba(0, 0, 0, 0.06);
+  --vision-glass-panel-bg: rgba(255, 255, 255, 0.85);
+  --vision-glass-shadow: 0 25px 60px rgba(15, 23, 42, 0.12), inset 0 1px 2px rgba(255, 255, 255, 0.8);
+  --glass-input-bg: rgba(255, 255, 255, 0.75);
+  --glass-input-border: rgba(0, 0, 0, 0.12);
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--text-main);
+  background: var(--bg-main);
+  font-family: var(--font-geist-sans), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  overflow-x: hidden;
+  transition: background-color 0.4s ease, color 0.4s ease;
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
+/* Custom Scrollbar for Glass Containers */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+/* Vibrant 3D Floating Sunset Orbs Animations */
+@keyframes orbFloat1 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1) rotate(0deg);
+  }
+  33% {
+    transform: translate(40px, -50px) scale(1.12) rotate(120deg);
+  }
+  66% {
+    transform: translate(-30px, 30px) scale(0.92) rotate(240deg);
+  }
+}
+
+@keyframes orbFloat2 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1) rotate(0deg);
+  }
+  50% {
+    transform: translate(-50px, 40px) scale(1.15) rotate(-180deg);
+  }
+}
+
+@keyframes orbPulse {
+  0%, 100% {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(1.08);
+  }
+}
+
+@keyframes modalScale {
+  0% {
+    opacity: 0;
+    transform: scale(0.94) translateY(12px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-orb-1 {
+  animation: orbFloat1 20s ease-in-out infinite;
+}
+
+.animate-orb-2 {
+  animation: orbFloat2 26s ease-in-out infinite;
+}
+
+.animate-orb-pulse {
+  animation: orbPulse 8s ease-in-out infinite;
+}
+
+.animate-modal-scale {
+  animation: modalScale 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* VisionOS & Neumorphic Glassmorphism Utility Classes */
+@layer components {
+  /* VisionOS Spatial Glass Card with Specular Bevel Edge */
+  .vision-glass-card {
+    background: var(--vision-glass-bg);
+    backdrop-filter: blur(36px) saturate(160%);
+    -webkit-backdrop-filter: blur(36px) saturate(160%);
+    border-top: 1px solid var(--vision-glass-border-top);
+    border-left: 1px solid var(--vision-glass-border-top);
+    border-right: 1px solid var(--vision-glass-border-bottom);
+    border-bottom: 1px solid var(--vision-glass-border-bottom);
+    box-shadow: var(--vision-glass-shadow);
+    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .vision-glass-card-hover:hover {
+    transform: translateY(-4px) scale(1.005);
+    box-shadow: 0 40px 90px rgba(0, 0, 0, 0.65), inset 0 1px 2px rgba(255, 255, 255, 0.4);
+    border-top-color: rgba(255, 255, 255, 0.6);
+    border-left-color: rgba(255, 255, 255, 0.6);
+  }
+
+  .vision-glass-panel {
+    background: var(--vision-glass-panel-bg);
+    backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
+    border-top: 1px solid var(--vision-glass-border-top);
+    border-left: 1px solid var(--vision-glass-border-top);
+    border-right: 1px solid var(--vision-glass-border-bottom);
+    border-bottom: 1px solid var(--vision-glass-border-bottom);
+    box-shadow: var(--vision-glass-shadow);
+  }
+
+  .glass-input {
+    background: var(--glass-input-bg);
+    backdrop-filter: blur(16px);
+    border-top: 1px solid rgba(255, 255, 255, 0.25);
+    border-left: 1px solid rgba(255, 255, 255, 0.25);
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    color: var(--text-main);
+    transition: all 0.2s ease;
+  }
+
+  .glass-input:focus {
+    outline: none;
+    border-color: rgba(255, 140, 0, 0.7);
+    box-shadow: 0 0 25px rgba(255, 110, 50, 0.3);
+  }
+
+  /* Vibrant Sunset Gradient Buttons & Chips */
+  .pill-sunset {
+    background: linear-gradient(135deg, #ff5e62 0%, #ff9966 50%, #ff007a 100%);
+    color: #ffffff;
+    box-shadow: 0 8px 30px rgba(255, 94, 98, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.4);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .pill-sunset:hover {
+    transform: translateY(-1.5px) scale(1.02);
+    box-shadow: 0 12px 38px rgba(255, 94, 98, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.6);
+  }
+
+  .pill-cyan {
+    background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);
+    color: #ffffff;
+    box-shadow: 0 8px 25px rgba(0, 198, 255, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.4);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .pill-cyan:hover {
+    transform: translateY(-1.5px) scale(1.02);
+    box-shadow: 0 12px 35px rgba(0, 198, 255, 0.55), inset 0 1px 1px rgba(255, 255, 255, 0.6);
   }
 }

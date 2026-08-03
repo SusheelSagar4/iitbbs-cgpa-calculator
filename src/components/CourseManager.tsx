@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { calculateSGPA, GRADE_POINTS, Grade } from '@/lib/grading'
+import CourseCombobox from './CourseCombobox'
+import { CourseDefinition } from '@/data/coursesData'
 
 export interface CourseItem {
   id: string
@@ -25,9 +27,23 @@ export default function CourseManager({
   const [courses, setCourses] = useState<CourseItem[]>(initialCourses)
 
   // Add Form input state
+  const [selectedCourse, setSelectedCourse] = useState<CourseDefinition | null>(null)
+  const [selectedBranch, setSelectedBranch] = useState<string>('CS')
+  const [showAllCourses, setShowAllCourses] = useState<boolean>(false)
   const [name, setName] = useState('')
   const [credits, setCredits] = useState<string>('3')
   const [grade, setGrade] = useState<Grade>('A')
+
+  const handleSelectCourse = (course: CourseDefinition | null) => {
+    setSelectedCourse(course)
+    if (course) {
+      setName(`${course.code}: ${course.name}`)
+      setCredits(course.credits.toString())
+    } else {
+      setName('')
+      setCredits('3')
+    }
+  }
 
   // Edit Row state
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -166,6 +182,7 @@ export default function CourseManager({
           grade: data.grade as Grade,
         }
         setCourses((prev) => [...prev, newCourseItem])
+        setSelectedCourse(null)
         setName('')
         setCredits('3')
         setGrade('A')
@@ -357,69 +374,82 @@ export default function CourseManager({
         )}
 
         {/* Add Course Form Row */}
-        <div className="border-t border-slate-800 bg-slate-900/90 p-4 sm:p-6">
-          <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">
+        <div className="border-t border-slate-800 bg-slate-900/90 p-4 sm:p-6 space-y-4">
+          <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-400">
             + Add New Course
           </h4>
-          <form onSubmit={handleAddCourse} className="grid grid-cols-1 gap-3 sm:grid-cols-12 items-end">
-            <div className="sm:col-span-5">
-              <label htmlFor="course-name" className="block text-xs font-medium text-slate-400 mb-1">
-                Course Name
-              </label>
-              <input
-                id="course-name"
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="e.g. Data Structures"
-                required
-                className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-white placeholder-slate-500 focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
-              />
-            </div>
 
-            <div className="sm:col-span-3">
-              <label htmlFor="course-credits" className="block text-xs font-medium text-slate-400 mb-1">
-                Credits
-              </label>
-              <input
-                id="course-credits"
-                type="number"
-                step="0.5"
-                min="0.5"
-                max="20"
-                value={credits}
-                onChange={(e) => setCredits(e.target.value)}
-                required
-                className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-white focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
-              />
-            </div>
+          <form onSubmit={handleAddCourse} className="space-y-4">
+            <CourseCombobox
+              selectedCourse={selectedCourse}
+              onSelectCourse={handleSelectCourse}
+              existingCourseNames={courses.map((c) => c.name)}
+              selectedBranch={selectedBranch}
+              onBranchChange={setSelectedBranch}
+              showAllCourses={showAllCourses}
+              onShowAllCoursesToggle={setShowAllCourses}
+            />
 
-            <div className="sm:col-span-2">
-              <label htmlFor="course-grade" className="block text-xs font-medium text-slate-400 mb-1">
-                Grade
-              </label>
-              <select
-                id="course-grade"
-                value={grade}
-                onChange={(e) => setGrade(e.target.value as Grade)}
-                className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-white focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
-              >
-                {gradeKeys.map((g) => (
-                  <option key={g} value={g}>
-                    {g} ({GRADE_POINTS[g]} pts)
-                  </option>
-                ))}
-              </select>
-            </div>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-12 items-end">
+              <div className="sm:col-span-6">
+                <label htmlFor="course-name-override" className="block text-xs font-medium text-slate-400 mb-1">
+                  Selected / Custom Course Title
+                </label>
+                <input
+                  id="course-name-override"
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Select from above or type custom course name"
+                  required
+                  className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-white placeholder-slate-500 focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
+                />
+              </div>
 
-            <div className="sm:col-span-2">
-              <button
-                type="submit"
-                disabled={isAdding}
-                className="w-full rounded-lg bg-teal-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition-all hover:bg-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-400 disabled:opacity-50"
-              >
-                {isAdding ? 'Adding...' : 'Add Course'}
-              </button>
+              <div className="sm:col-span-2">
+                <label htmlFor="course-credits" className="block text-xs font-medium text-slate-400 mb-1">
+                  Credits
+                </label>
+                <input
+                  id="course-credits"
+                  type="number"
+                  step="0.5"
+                  min="0.5"
+                  max="20"
+                  value={credits}
+                  onChange={(e) => setCredits(e.target.value)}
+                  required
+                  className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-white focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
+                />
+              </div>
+
+              <div className="sm:col-span-2">
+                <label htmlFor="course-grade" className="block text-xs font-medium text-slate-400 mb-1">
+                  Grade
+                </label>
+                <select
+                  id="course-grade"
+                  value={grade}
+                  onChange={(e) => setGrade(e.target.value as Grade)}
+                  className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-white focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
+                >
+                  {gradeKeys.map((g) => (
+                    <option key={g} value={g}>
+                      {g} ({GRADE_POINTS[g]} pts)
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="sm:col-span-2">
+                <button
+                  type="submit"
+                  disabled={isAdding || !name.trim()}
+                  className="w-full rounded-lg bg-teal-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition-all hover:bg-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-400 disabled:opacity-50"
+                >
+                  {isAdding ? 'Adding...' : 'Add Course'}
+                </button>
+              </div>
             </div>
           </form>
         </div>
