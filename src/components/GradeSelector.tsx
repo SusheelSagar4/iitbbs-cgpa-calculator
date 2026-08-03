@@ -44,7 +44,7 @@ export default function GradeSelector({
                   : g === 'EX' || g === 'A'
                   ? 'pill-sunset scale-105 font-black border-t border-l border-white/50'
                   : 'pill-cyan scale-105 font-black border-t border-l border-white/50'
-                : 'border-t border-l border-white/20 border-r border-b border-white/5 bg-white/5 text-[var(--text-muted)] hover:border-amber-400/50 hover:bg-white/10 hover:text-[var(--text-main)]'
+                : 'border-t border-l border-white/20 border-r border-b border-white/5 bg-white/5 text-[var(--text-muted)] hover:border-[var(--color-gold)]/50 hover:bg-white/10 hover:text-[var(--text-main)]'
             }`}
           >
             {g}
