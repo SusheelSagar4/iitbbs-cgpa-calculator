@@ -12,7 +12,7 @@ export interface CourseItem {
   grade: Grade
 }
 
-interface SemesterItem {
+export interface SemesterItem {
   id: string
   semester_number: number
   courses: CourseItem[]

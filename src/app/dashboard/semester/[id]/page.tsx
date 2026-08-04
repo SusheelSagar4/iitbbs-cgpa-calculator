@@ -3,9 +3,8 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import CourseManager from '@/components/CourseManager'
+import CourseManager, { SemesterItem } from '@/components/CourseManager'
 import DeleteSemesterButton from '@/components/DeleteSemesterButton'
-import { SemesterItem } from '../../page'
 
 interface PageProps {
   params: {
