@@ -8,6 +8,7 @@ An interactive web application for IIT Bhubaneswar B.Tech students to track, cal
 - [Prerequisites](#prerequisites)
 - [Installation](#installation)
 - [Usage / Quick Start](#usage--quick-start)
+- [Deployment](#deployment)
 - [Configuration](#configuration)
 - [Project Structure](#project-structure)
 - [Contributing](#contributing)
@@ -75,6 +76,17 @@ Run ESLint to check for code syntax or linting issues:
 ```bash
 npm run lint
 ```
+
+## Deployment
+
+The application can be deployed directly to [Vercel](https://vercel.com/):
+
+1. Push your code to a GitHub repository.
+2. Import the repository into the [Vercel Platform](https://vercel.com/new).
+3. Configure environment variables (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`) in the Vercel project settings if needed.
+4. Deploy.
+
+For more details on Next.js deployment, check out the official [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying).
 
 ## Configuration
 
