@@ -2,6 +2,8 @@
 
 An interactive web application for IIT Bhubaneswar B.Tech students to track, calculate, and predict SGPA and CGPA across all 8 semesters with branch-specific official curriculum data.
 
+🔗 **Live Application**: [https://iitbbs-cgpa-calculator.vercel.app/](https://iitbbs-cgpa-calculator.vercel.app/)
+
 ## Table of Contents
 
 - [Features](#features)
@@ -78,6 +80,11 @@ npm run lint
 ```
 
 ## Deployment
+
+The application is deployed live on Vercel:
+👉 **Live URL**: [https://iitbbs-cgpa-calculator.vercel.app/](https://iitbbs-cgpa-calculator.vercel.app/)
+
+### Deploying Your Own Instance
 
 The application can be deployed directly to [Vercel](https://vercel.com/):
 
