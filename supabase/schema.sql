@@ -84,3 +84,45 @@ create policy "Users can delete courses of their own semesters"
       and semesters.user_id = auth.uid()
     )
   );
+
+-- Create page_visits table for anonymous visit tracking
+create table if not exists page_visits (
+  id uuid primary key default gen_random_uuid(),
+  path text not null,
+  created_at timestamptz default now()
+);
+
+-- Enable Row Level Security (RLS) on page_visits
+alter table page_visits enable row level security;
+
+-- Allow anonymous public inserts for visit tracking
+create policy "Allow anonymous page visit inserts"
+  on page_visits for insert
+  with check (true);
+
+-- Create a Security Definer function to return aggregate visit stats securely
+create or replace function get_visit_stats()
+returns json
+language plpgsql
+security definer
+as $$
+declare
+  total_count bigint;
+  today_count bigint;
+  week_count bigint;
+begin
+  select count(*) into total_count from page_visits;
+  select count(*) into today_count from page_visits where created_at >= date_trunc('day', now());
+  select count(*) into week_count from page_visits where created_at >= (now() - interval '7 days');
+  
+  return json_build_object(
+    'totalVisits', total_count,
+    'todayVisits', today_count,
+    'weekVisits', week_count
+  );
+end;
+$$;
+
+-- Grant execution permission on get_visit_stats function
+grant execute on function get_visit_stats() to anon, authenticated, service_role;
+

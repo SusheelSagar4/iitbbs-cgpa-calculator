@@ -1,11 +1,12 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { calculateSGPA, calculateCGPA, Course } from '@/lib/grading'
 import { saveLocalTrackerData, clearLocalTrackerData, LocalSemester, LocalCourse } from '@/lib/storage'
+import { getVisitStats, VisitStats } from '@/lib/visitStats'
 import GradeSelector from './GradeSelector'
 import AddCourseModal from './AddCourseModal'
-import { Award, BookOpen, Plus, RotateCcw, Trash2, CheckCircle2, Edit3 } from 'lucide-react'
+import { Award, BookOpen, Plus, RotateCcw, Trash2, CheckCircle2, Edit3, Eye, TrendingUp } from 'lucide-react'
 
 interface CurriculumDashboardProps {
   branchId: string
@@ -20,6 +21,11 @@ export default function CurriculumDashboard({
 }: CurriculumDashboardProps) {
   const [semesters, setSemesters] = useState<LocalSemester[]>(initialSemesters)
   const [activeModalSemNumber, setActiveModalSemNumber] = useState<number | null>(null)
+  const [visitStats, setVisitStats] = useState<VisitStats | null>(null)
+
+  useEffect(() => {
+    getVisitStats().then((stats) => setVisitStats(stats))
+  }, [])
 
   // Handle grade change locally and persist to localStorage
   const handleGradeChange = (semesterId: string, courseId: string, newGrade: string) => {
@@ -220,7 +226,33 @@ export default function CurriculumDashboard({
             />
           </div>
         </div>
+
+        {/* Privacy-Friendly Page Visit Analytics */}
+        {visitStats && (
+          <div className="pt-4 border-t border-white/10 flex flex-wrap items-center justify-between gap-4 text-xs">
+            <div className="flex items-center gap-2">
+              <Eye className="h-4 w-4 text-[var(--color-gold)]" />
+              <span className="font-bold text-[var(--text-main)]">Page Visit Analytics:</span>
+              <span className="text-[var(--text-muted)] font-medium hidden sm:inline">(Anonymous & Privacy-Friendly)</span>
+            </div>
+            <div className="flex items-center gap-6">
+              <div>
+                <span className="text-[var(--text-muted)]">Today:</span>{' '}
+                <strong className="text-[var(--color-gold)] font-black">{visitStats.todayVisits}</strong>
+              </div>
+              <div>
+                <span className="text-[var(--text-muted)]">Last 7 Days:</span>{' '}
+                <strong className="text-[var(--color-gold)] font-black">{visitStats.weekVisits}</strong>
+              </div>
+              <div>
+                <span className="text-[var(--text-muted)]">All-Time:</span>{' '}
+                <strong className="text-[var(--color-gold)] font-black">{visitStats.totalVisits}</strong>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
+
 
       {/* 8 Semesters Curriculum Grid */}
       <div className="space-y-6">

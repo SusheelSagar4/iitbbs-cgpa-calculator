@@ -103,16 +103,17 @@ Environment variables are defined in `.env.local` for local development.
 
 | Variable | Description | Required |
 | :--- | :--- | :--- |
-| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL (`https://<project-ref>.supabase.co`) | Optional* |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase public anonymous API key | Optional* |
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL (`https://<project-ref>.supabase.co`) | Required for Visit Tracking |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase public anonymous API key | Required for Visit Tracking |
 
-> **Note / Flagged Gap**: The application currently uses `localStorage` (`src/lib/storage.ts`) for persisting user semester states. Supabase client/server helper files (`src/lib/supabase/client.ts`, `src/lib/supabase/server.ts`) and schema (`supabase/schema.sql`) exist in the repository, but user authentication and cloud database synchronization are not active in the current UI workflow.
+> **Note**: User academic data (semesters & course grades) is saved locally in browser `localStorage` (`src/lib/storage.ts`). Supabase is used for privacy-friendly, anonymous page-visit counter analytics (`page_visits` table & `get_visit_stats` RPC function).
 
 ### Database Setup (Supabase)
 
 If setting up the Supabase database schema manually:
 1. Run the SQL statements in [`supabase/schema.sql`](file:///c:/Bunty/IIT%20BBS/Project/iitbbs-cgpa-calculator-1/supabase/schema.sql) in your Supabase SQL Editor.
-2. The schema creates `semesters` and `courses` tables with Row Level Security (RLS) policies.
+2. The schema creates `semesters`, `courses`, and `page_visits` tables with Row Level Security (RLS) policies and the `get_visit_stats()` RPC function.
+
 
 ## Project Structure
 
