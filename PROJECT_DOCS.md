@@ -360,6 +360,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=<your-anon-key>
 ## 4. Change Log
 
 ## Change Log
+- **2026-08-25** — Fixed Vercel production build failure (`npm run build` exit code 1) caused by an unused `TrendingUp` import in `CurriculumDashboard.tsx` (ESLint `@typescript-eslint/no-unused-vars` error). Added `export const dynamic = 'force-dynamic'` to `/api/track-visit` and `/api/visit-stats` routes, and safe fallback defaults for Supabase environment variables in `client.ts` and `server.ts`.
 - **2026-08-25** — Configured dual Git push remotes (`origin`) for simultaneous multi-repo synchronization to both `https://github.com/bhuvan-0412/iitbbs-cgpa-calculator.git` and `https://github.com/SusheelSagar4/iitbbs-cgpa-calculator.git`.
 - **2026-08-25** — Configured `https://github.com/bhuvan-0412/iitbbs-cgpa-calculator.git` as the default Git remote repository and pushed all project branches (`main`, `dev/bhuvan`, `dev/susheel`).
 - **2026-08-25** — Implemented privacy-friendly page visit tracking system with Supabase `page_visits` table, RLS insert policy, `get_visit_stats()` RPC function, API routes (`/api/track-visit` & `/api/visit-stats`), `VisitTracker` client component, `visitStats` utility library, and `CurriculumDashboard` analytics card.

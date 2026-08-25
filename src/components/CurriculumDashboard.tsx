@@ -6,7 +6,7 @@ import { saveLocalTrackerData, clearLocalTrackerData, LocalSemester, LocalCourse
 import { getVisitStats, VisitStats } from '@/lib/visitStats'
 import GradeSelector from './GradeSelector'
 import AddCourseModal from './AddCourseModal'
-import { Award, BookOpen, Plus, RotateCcw, Trash2, CheckCircle2, Edit3, Eye, TrendingUp } from 'lucide-react'
+import { Award, BookOpen, Plus, RotateCcw, Trash2, CheckCircle2, Edit3, Eye } from 'lucide-react'
 
 interface CurriculumDashboardProps {
   branchId: string
