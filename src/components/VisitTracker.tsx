@@ -14,15 +14,22 @@ export default function VisitTracker() {
 
     const track = async () => {
       try {
-        await fetch('/api/track-visit', {
+        console.log('[VisitTracker] Tracking page visit for path:', pathname)
+        const res = await fetch('/api/track-visit', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({ path: pathname }),
         })
-      } catch {
-        // Fail silently without disrupting page rendering or throwing errors
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}))
+          console.error('[VisitTracker] API returned error status:', res.status, data)
+        } else {
+          console.log('[VisitTracker] Successfully recorded visit for path:', pathname)
+        }
+      } catch (err) {
+        console.error('[VisitTracker] Network error sending tracking request:', err)
       }
     }
 

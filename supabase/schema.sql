@@ -96,8 +96,10 @@ create table if not exists page_visits (
 alter table page_visits enable row level security;
 
 -- Allow anonymous public inserts for visit tracking
+drop policy if exists "Allow anonymous page visit inserts" on page_visits;
 create policy "Allow anonymous page visit inserts"
   on page_visits for insert
+  to anon, authenticated, public
   with check (true);
 
 -- Create a Security Definer function to return aggregate visit stats securely
