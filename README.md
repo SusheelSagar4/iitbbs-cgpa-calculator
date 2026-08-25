@@ -41,7 +41,7 @@ An interactive web application for IIT Bhubaneswar B.Tech students to track, cal
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/SusheelSagar4/iitbbs-cgpa-calculator.git
+   git clone https://github.com/bhuvan-0412/iitbbs-cgpa-calculator.git
    cd iitbbs-cgpa-calculator-1
    ```
 

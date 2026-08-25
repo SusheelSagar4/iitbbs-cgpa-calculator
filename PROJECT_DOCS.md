@@ -331,7 +331,7 @@ The **IIT Bhubaneswar CGPA Calculator & Academic Tracker** is a client-centric w
 ### Installation
 1. Clone the repository:
    ```bash
-   git clone https://github.com/SusheelSagar4/iitbbs-cgpa-calculator.git
+   git clone https://github.com/bhuvan-0412/iitbbs-cgpa-calculator.git
    cd iitbbs-cgpa-calculator-1
    ```
 2. Install npm dependencies:
@@ -360,5 +360,6 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=<your-anon-key>
 ## 4. Change Log
 
 ## Change Log
+- **2026-08-25** — Configured `https://github.com/bhuvan-0412/iitbbs-cgpa-calculator.git` as the default Git remote repository and pushed all project branches (`main`, `dev/bhuvan`, `dev/susheel`).
 - **2026-08-25** — Implemented privacy-friendly page visit tracking system with Supabase `page_visits` table, RLS insert policy, `get_visit_stats()` RPC function, API routes (`/api/track-visit` & `/api/visit-stats`), `VisitTracker` client component, `visitStats` utility library, and `CurriculumDashboard` analytics card.
 - **2026-08-25** — Created comprehensive project documentation in `PROJECT_DOCS.md` detailing architecture, full file-by-file breakdown, setup instructions, and change logging commitments.
