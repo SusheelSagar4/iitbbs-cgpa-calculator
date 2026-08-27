@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import { DotGothic16 } from "next/font/google";
+import { Oswald, DotGothic16 } from "next/font/google";
 import VisitTracker from "@/components/VisitTracker";
 import "./globals.css";
 
@@ -19,6 +19,11 @@ const dotGothic = DotGothic16({
   subsets: ["latin"],
   variable: "--font-pixel",
 });
+const oswald = Oswald({
+  weight: ["400", "500", "600", "700"],
+  subsets: ["latin"],
+  variable: "--font-oswald",
+});
 
 export const metadata: Metadata = {
   title: "IIT Bhubaneswar CGPA Calculator & Academic Tracker",
@@ -33,7 +38,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${dotGothic.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${dotGothic.variable} ${oswald.variable} antialiased`}
       >
         <VisitTracker />
         {children}

@@ -334,8 +334,8 @@ export function LandingHero() {
           </span>
         </div>
 
-        {/* 2-Line Headline in GeistSans Bold Typography */}
-        <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold text-white tracking-tight uppercase leading-tight mb-4 drop-shadow-2xl">
+        {/* 2-Line Headline in Oswald Typography */}
+        <h1 className="font-oswald text-4xl sm:text-6xl md:text-7xl font-bold text-white tracking-tight uppercase leading-tight mb-4 drop-shadow-2xl">
           <span className="block animate-hero-reveal animation-delay-100">
             Track Your
           </span>

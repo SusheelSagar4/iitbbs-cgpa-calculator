@@ -213,6 +213,11 @@ body {
   font-family: var(--font-pixel), 'DotGothic16', monospace;
 }
 
+/* Custom Oswald Display Font Utility */
+.font-oswald {
+  font-family: var(--font-oswald), 'Oswald', sans-serif;
+}
+
 /* Custom Hero Section & Header Animations */
 @keyframes slideDown {
   from {
