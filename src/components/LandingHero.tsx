@@ -3,453 +3,374 @@
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { initializeLocalCurriculum } from '@/lib/storage'
 
-interface Building {
-  id: string
-  name: string
-  label: string
-  image: string
-  mobilePosition: string
-}
+// EDITABLE: Campus background images cross-fading automatically
+const CAMPUS_IMAGES = [
+  '/Images/hero-admin.jpg',
+  '/Images/hero-secs.jpg',
+  '/Images/hero-sif.jpg',
+  '/Images/hero-smmme.jpg',
+  '/Images/hero-sms.jpg',
+  '/Images/iitbbs.jpg',
+]
 
-const BUILDINGS: Building[] = [
+// EDITABLE: 7 IIT Bhubaneswar B.Tech Departments for the Trust Row
+const DEPARTMENTS = [
+  { code: 'CSE', name: 'Computer Science & Engineering', bg: 'bg-blue-600' },
+  { code: 'EE', name: 'Electrical Engineering', bg: 'bg-amber-500' },
+  { code: 'ECE', name: 'Electronics & Communication', bg: 'bg-purple-600' },
+  { code: 'ME', name: 'Mechanical Engineering', bg: 'bg-emerald-600' },
+  { code: 'CE', name: 'Civil Engineering', bg: 'bg-orange-600' },
+  { code: 'MM', name: 'Metallurgical & Materials', bg: 'bg-cyan-600' },
+  { code: 'EP', name: 'Engineering Physics', bg: 'bg-rose-600' },
+]
+
+// EDITABLE: Stats Footer metrics. Update values and labels here.
+const STATS = [
   {
-    id: 'admin',
-    name: 'Admin Building',
-    label: 'ADMIN BUILDING',
-    image: '/Images/hero-admin.jpg',
-    mobilePosition: '50% bottom',
+    id: 'depts',
+    value: 7,
+    suffix: '',
+    label: 'Departments',
+    icon: (
+      <svg className="w-5 h-5 text-[#D4A853]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+      </svg>
+    ),
   },
   {
-    id: 'sms',
-    name: 'School of Mechanical Sciences',
-    label: 'SCHOOL OF MECHANICAL SCIENCES',
-    image: '/Images/hero-sms.jpg',
-    mobilePosition: '50% bottom',
+    id: 'scale',
+    value: 10,
+    suffix: ' pts',
+    label: 'Grading Scale',
+    icon: (
+      <svg className="w-5 h-5 text-[#D4A853]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+      </svg>
+    ),
   },
   {
-    id: 'secs',
-    name: 'School of Electrical & Computer Sciences',
-    label: 'SCHOOL OF ELECTRICAL & COMPUTER SCIENCES',
-    image: '/Images/hero-secs.jpg',
-    mobilePosition: '50% bottom',
+    id: 'semesters',
+    value: 8,
+    suffix: '',
+    label: 'Semesters Tracked',
+    icon: (
+      <svg className="w-5 h-5 text-[#D4A853]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+      </svg>
+    ),
   },
   {
-    id: 'sif',
-    name: 'School of Infrastructure',
-    label: 'SCHOOL OF INFRASTRUCTURE',
-    image: '/Images/hero-sif.jpg',
-    mobilePosition: '50% bottom',
-  },
-  {
-    id: 'smmme',
-    name: 'School of Minerals, Metallurgical & Materials Engineering',
-    label: 'SCHOOL OF MINERALS, METALLURGICAL & MATERIALS ENG.',
-    image: '/Images/hero-smmme.jpg',
-    mobilePosition: '50% bottom',
+    id: 'students',
+    value: 1200,
+    suffix: '+',
+    format: (val: number) => val.toLocaleString(),
+    label: 'Students Helped',
+    icon: (
+      <svg className="w-5 h-5 text-[#D4A853]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+      </svg>
+    ),
   },
 ]
 
+// Animated count-up stat card using IntersectionObserver & easeOutCubic
+function StatItem({ stat, index }: { stat: (typeof STATS)[0]; index: number }) {
+  const [count, setCount] = useState(0)
+  const ref = useRef<HTMLDivElement>(null)
+  const animatedRef = useRef(false)
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !animatedRef.current) {
+          animatedRef.current = true
+          const duration = 1600
+          const start = performance.now()
+          const target = stat.value
+
+          const animate = (now: number) => {
+            const elapsed = now - start
+            const progress = Math.min(elapsed / duration, 1)
+            const easeProgress = 1 - Math.pow(1 - progress, 3) // easeOutCubic
+            setCount(Math.floor(easeProgress * target))
+
+            if (progress < 1) {
+              requestAnimationFrame(animate)
+            } else {
+              setCount(target)
+            }
+          }
+          requestAnimationFrame(animate)
+        }
+      },
+      { threshold: 0.2 }
+    )
+
+    if (ref.current) {
+      observer.observe(ref.current)
+    }
+
+    return () => observer.disconnect()
+  }, [stat.value])
+
+  const formattedValue = stat.format ? stat.format(count) : count
+
+  return (
+    <div
+      ref={ref}
+      className="flex flex-col items-center justify-center p-3 sm:p-4 rounded-2xl bg-[#0A1628]/45 border border-white/10 backdrop-blur-md shadow-lg animate-hero-reveal"
+      style={{ animationDelay: `${400 + index * 100}ms` }}
+    >
+      <div className="flex items-center gap-2 mb-1">
+        <div className="p-1.5 rounded-lg bg-white/10 flex items-center justify-center">
+          {stat.icon}
+        </div>
+        <span className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+          {formattedValue}
+          {stat.suffix}
+        </span>
+      </div>
+      <span className="text-xs text-[#8B94A3] font-medium tracking-wide uppercase">
+        {stat.label}
+      </span>
+    </div>
+  )
+}
+
 export function LandingHero() {
   const router = useRouter()
-  const [progress, setProgress] = useState(0)
-  const wrapperRef = useRef<HTMLDivElement>(null)
-  const [secsExpanded, setSecsExpanded] = useState(false)
-  const [loadingBranch, setLoadingBranch] = useState<string | null>(null)
+  const [currentBg, setCurrentBg] = useState(0)
+  const [activeNav, setActiveNav] = useState('Home')
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
-  // 1. Preload images on mount to avoid loading flickers
+  // 1. Crossfade background slideshow every 5 seconds
   useEffect(() => {
-    BUILDINGS.forEach((b) => {
+    const interval = setInterval(() => {
+      setCurrentBg((prev) => (prev + 1) % CAMPUS_IMAGES.length)
+    }, 5000)
+    return () => clearInterval(interval)
+  }, [])
+
+  // 2. Preload campus imagery on mount
+  useEffect(() => {
+    CAMPUS_IMAGES.forEach((src) => {
       const img = new Image()
-      img.src = b.image
+      img.src = src
     })
   }, [])
 
-  // 2. Add scroll and resize listeners to calculate scroll progress
-  useEffect(() => {
-    let activeFrameId: number | null = null
+  const navLinks = [
+    { label: 'Home', href: '/', id: 'Home' },
+    { label: 'Calculator', href: '/select-branch', id: 'Calculator' },
+    { label: 'Departments', href: '/select-branch', id: 'Departments' },
+    { label: 'About', href: '#about', id: 'About' },
+  ]
 
-    const handleScroll = () => {
-      if (activeFrameId !== null) return
-
-      activeFrameId = requestAnimationFrame(() => {
-        const wrapper = wrapperRef.current
-        if (wrapper) {
-          const rect = wrapper.getBoundingClientRect()
-          const totalScrollableHeight = rect.height - window.innerHeight
-          
-          // Clamp progress between 0 and 1
-          const scrolled = -rect.top
-          const currentProgress = Math.max(0, Math.min(1, scrolled / totalScrollableHeight))
-          setProgress(currentProgress)
-        }
-        activeFrameId = null
-      })
+  const handleNavClick = (id: string, href: string) => {
+    setActiveNav(id)
+    setMobileMenuOpen(false)
+    if (href.startsWith('/')) {
+      router.push(href)
     }
-
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    window.addEventListener('resize', handleScroll, { passive: true })
-    
-    // Set initial progress
-    handleScroll()
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll)
-      window.removeEventListener('resize', handleScroll)
-      if (activeFrameId !== null) {
-        cancelAnimationFrame(activeFrameId)
-      }
-    }
-  }, [])
-
-  // 3. Mathematical cross-fade opacity calculator
-  const getOpacity = (index: number, p: number) => {
-    const count = BUILDINGS.length
-    if (count <= 1) return index === 0 ? 1 : 0
-
-    const targetProgress = index / (count - 1)
-    const segmentWidth = 1 / (count - 1)
-    const distance = Math.abs(p - targetProgress)
-
-    if (distance < segmentWidth) {
-      return 1 - distance / segmentWidth
-    }
-    return 0
-  }
-
-  // 4. Smooth scrolling action for progress dots navigation
-  const scrollToBuilding = (index: number) => {
-    const wrapper = wrapperRef.current
-    if (!wrapper) return
-
-    const rect = wrapper.getBoundingClientRect()
-    const totalHeight = rect.height
-    const targetProgress = index / (BUILDINGS.length - 1)
-    const totalScrollableHeight = totalHeight - window.innerHeight
-
-    // Calculate absolute scroll position on the page
-    const absoluteScrollY = window.scrollY + rect.top + targetProgress * totalScrollableHeight
-
-    window.scrollTo({
-      top: absoluteScrollY,
-      behavior: 'smooth',
-    })
-  }
-
-  // Determine active building index for navigation dots and tooltips
-  const activeIndex = Math.min(
-    BUILDINGS.length - 1,
-    Math.round(progress * (BUILDINGS.length - 1))
-  )
-
-  // Collapse SECS sub-menu if active index changes
-  useEffect(() => {
-    if (activeIndex !== 2) {
-      setSecsExpanded(false)
-    }
-  }, [activeIndex])
-
-  const handleNavigate = (branchId: string, slug: string) => {
-    setLoadingBranch(slug)
-    initializeLocalCurriculum(branchId)
-    setTimeout(() => {
-      router.push(`/calculator/${slug}`)
-    }, 450)
   }
 
   return (
-    <div ref={wrapperRef} className="hero-wrapper-scroll">
-      <div className="hero-sticky-container">
-        {/* Background cross-fading layers */}
-        <div className="absolute inset-0 z-0">
-          {BUILDINGS.map((b, idx) => {
-            const opacity = getOpacity(idx, progress)
-            return (
-              <div
-                key={b.id}
-                className="hero-bg-layer"
-                style={{
-                  backgroundImage: `linear-gradient(to bottom, rgba(10, 22, 40, 0.85) 0%, rgba(10, 22, 40, 0.4) 50%, rgba(10, 22, 40, 0.95) 100%), url('${b.image}')`,
-                  opacity,
-                  // Keep layers with 0 opacity unclickable and hidden from layout rendering
-                  visibility: opacity > 0.01 ? 'visible' : 'hidden',
-                  pointerEvents: opacity > 0.01 ? 'auto' : 'none',
-                }}
-              />
-            )
-          })}
-        </div>
+    <div className="h-screen min-h-[660px] max-h-screen w-full relative overflow-hidden flex flex-col justify-between select-none">
+      {/* FULL-BLEED BACKGROUND WITH CROSSFADE SLIDESHOW & DARK OVERLAY */}
+      <div className="absolute inset-0 z-0">
+        {CAMPUS_IMAGES.map((img, idx) => (
+          <div
+            key={img}
+            className="hero-bg-layer"
+            style={{
+              backgroundImage: `linear-gradient(to bottom, rgba(10, 22, 40, 0.78) 0%, rgba(10, 22, 40, 0.65) 45%, rgba(10, 22, 40, 0.92) 100%), url('${img}')`,
+              opacity: idx === currentBg ? 1 : 0,
+              transform: idx === currentBg ? 'scale(1.04)' : 'scale(1)',
+              visibility: idx === currentBg ? 'visible' : 'hidden',
+            }}
+          />
+        ))}
+      </div>
 
-        {/* Navbar/Header */}
-        <header className="w-full max-w-7xl mx-auto px-6 py-6 flex items-center justify-between z-20 relative">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#D4A853] to-[#e6be6e] flex items-center justify-center shadow-lg shadow-[#D4A853]/25">
-              <svg className="w-5 h-5 text-[#0A1628] font-bold" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 11h.01M12 7h.01M15 11h.01M12 14h.01M4 6h16a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2z" />
-              </svg>
-            </div>
-            <div>
-              <span className="font-bold text-lg text-[#F5F1E8] tracking-tight block leading-none">IITBBS</span>
-              <span className="text-[10px] font-mono tracking-widest text-[#D4A853] uppercase">CGPA Predictor</span>
-            </div>
+      {/* REGION 1: HEADER (Entrance: Slide down + Fade) */}
+      <header className="w-full max-w-7xl mx-auto px-4 sm:px-6 pt-5 pb-3 flex items-center justify-between z-20 relative animate-slide-down">
+        {/* Circular Logo Mark */}
+        <Link href="/" className="flex items-center gap-3 group focus:outline-none">
+          <div className="w-11 h-11 rounded-full bg-white text-[#0A1628] flex items-center justify-center font-black text-sm tracking-tighter shadow-xl shadow-black/20 group-hover:scale-[1.04] transition-transform duration-300 border-2 border-white/80">
+            IITB
           </div>
-          
-          <div>
-            <Link
-              href="/select-branch"
-              className="text-sm font-semibold text-[#F5F1E8] hover:text-white bg-[#1E3A5F]/60 hover:bg-[#1E3A5F]/80 px-5 py-2.5 rounded-full border border-[#8B94A3]/50 hover:border-[#D4A853] transition-all duration-300 backdrop-blur-md shadow-sm"
-            >
-              Go to Calculator
-            </Link>
+          <div className="flex flex-col">
+            <span className="font-bold text-base text-white tracking-tight leading-none group-hover:text-[#D4A853] transition-colors">
+              IIT Bhubaneswar
+            </span>
+            <span className="text-[10px] font-mono tracking-widest text-[#D4A853] uppercase mt-0.5">
+              CGPA Predictor
+            </span>
           </div>
-        </header>
+        </Link>
 
-        {/* Monospace Building/School Name Label (Positioned top-left, cross-fades in sync) */}
-        <div className="absolute top-[88px] left-6 md:left-12 z-20 w-[calc(100%-3rem)] md:w-auto">
-          <div className="relative h-10 w-full md:w-[480px]">
-            {BUILDINGS.map((b, idx) => {
-              const opacity = getOpacity(idx, progress)
+        {/* Desktop White Pill Nav (Active link has 3-dot indicator) */}
+        <nav className="hidden md:flex items-center rounded-full bg-white/10 border border-white/20 backdrop-blur-md px-6 py-2 shadow-lg shadow-black/10">
+          <div className="flex items-center gap-8 text-sm font-medium text-white">
+            {navLinks.map((link) => {
+              const isActive = activeNav === link.id
               return (
-                <span
-                  key={b.id}
-                  className="absolute left-0 top-0 font-mono tracking-[0.2em] text-[11px] md:text-xs font-bold uppercase text-[#D4A853] transition-all duration-150 ease-out block leading-relaxed"
-                  style={{
-                    opacity,
-                    transform: `translateX(${(1 - opacity) * -12}px)`,
-                    pointerEvents: opacity > 0.05 ? 'auto' : 'none',
-                    visibility: opacity > 0.05 ? 'visible' : 'hidden',
-                  }}
+                <button
+                  key={link.id}
+                  onClick={() => handleNavClick(link.id, link.href)}
+                  className="relative group py-1 focus:outline-none transition-all duration-200"
                 >
-                  [ {b.label} ]
-                </span>
+                  <span
+                    className={`block transition-opacity duration-200 ${
+                      isActive ? 'opacity-100 font-semibold' : 'opacity-50 group-hover:opacity-75'
+                    }`}
+                  >
+                    {link.label}
+                  </span>
+                  {isActive && (
+                    <div className="flex gap-1 justify-center items-center mt-0.5">
+                      <span className="w-1 h-1 rounded-full bg-[#D4A853]"></span>
+                      <span className="w-1 h-1 rounded-full bg-[#D4A853]"></span>
+                      <span className="w-1 h-1 rounded-full bg-[#D4A853]"></span>
+                    </div>
+                  )}
+                </button>
               )
             })}
           </div>
+        </nav>
 
-          {/* Interactive School Branch Actions Container */}
-          <div className="mt-3 md:mt-2 min-h-[50px] relative w-full md:w-[480px]">
-            {/* SMS Selection */}
-            <div 
-              className="absolute left-0 top-0 transition-all duration-300"
-              style={{
-                opacity: getOpacity(1, progress),
-                visibility: getOpacity(1, progress) > 0.05 ? 'visible' : 'hidden',
-                pointerEvents: getOpacity(1, progress) > 0.05 ? 'auto' : 'none',
-              }}
-            >
-              <button
-                onClick={() => handleNavigate('ME', 'mechanical')}
-                disabled={!!loadingBranch}
-                className="inline-flex items-center gap-2 text-xs font-bold text-[#0A1628] bg-[#D4A853] hover:bg-[#B8873F] px-5 py-2.5 rounded-full shadow-lg shadow-[#D4A853]/10 hover:shadow-[#D4A853]/25 transition-all duration-300 hover:-translate-y-0.5 active:scale-95 disabled:opacity-50"
-              >
-                {loadingBranch === 'mechanical' ? (
-                  <span className="flex items-center gap-1.5"><span className="w-3.5 h-3.5 border-2 border-[#0A1628] border-t-transparent animate-spin rounded-full"></span>Loading...</span>
-                ) : (
-                  'Select This Branch'
-                )}
-              </button>
-            </div>
-
-            {/* SECS Selection */}
-            <div 
-              className="absolute left-0 top-0 transition-all duration-300 flex items-center gap-3"
-              style={{
-                opacity: getOpacity(2, progress),
-                visibility: getOpacity(2, progress) > 0.05 ? 'visible' : 'hidden',
-                pointerEvents: getOpacity(2, progress) > 0.05 ? 'auto' : 'none',
-              }}
-            >
-              {!secsExpanded ? (
-                <button
-                  onClick={() => setSecsExpanded(true)}
-                  className="inline-flex items-center gap-2 text-xs font-bold text-[#0A1628] bg-[#D4A853] hover:bg-[#B8873F] px-5 py-2.5 rounded-full shadow-lg shadow-[#D4A853]/10 hover:shadow-[#D4A853]/25 transition-all duration-300 hover:-translate-y-0.5 active:scale-95"
-                >
-                  Select This School &rarr;
-                </button>
-              ) : (
-                <div className="flex items-center gap-2 md:gap-3 bg-[#0A1628]/80 p-2 md:p-2.5 rounded-2xl border border-[#1E3A5F]/60 backdrop-blur-md shadow-2xl animate-fade-in-up">
-                  {/* Close / Collapse button */}
-                  <button
-                    onClick={() => setSecsExpanded(false)}
-                    className="p-1.5 rounded-full hover:bg-[#1E3A5F]/50 text-[#8B94A3] hover:text-white transition-colors"
-                    aria-label="Back"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" />
-                    </svg>
-                  </button>
-
-                  {/* Option 1: CSE */}
-                  <button
-                    onClick={() => handleNavigate('CS', 'cse')}
-                    disabled={!!loadingBranch}
-                    className={`px-3.5 py-2 rounded-full text-xs font-bold transition-all duration-300 active:scale-95 flex items-center gap-1.5 ${
-                      loadingBranch === 'cse'
-                        ? 'bg-[#D4A853] text-[#0A1628] scale-105 shadow-md shadow-[#D4A853]/20'
-                        : 'bg-[#1E3A5F] border border-[#1E3A5F]/60 text-[#F5F1E8] hover:bg-[#D4A853] hover:text-[#0A1628] hover:border-[#D4A853]'
-                    }`}
-                    style={{ transitionDelay: '0ms' }}
-                  >
-                    {loadingBranch === 'cse' && <span className="w-3 h-3 border-2 border-[#0A1628] border-t-transparent animate-spin rounded-full"></span>}
-                    CSE
-                  </button>
-
-                  {/* Option 2: EE */}
-                  <button
-                    onClick={() => handleNavigate('EE', 'ee')}
-                    disabled={!!loadingBranch}
-                    className={`px-3.5 py-2 rounded-full text-xs font-bold transition-all duration-300 active:scale-95 flex items-center gap-1.5 ${
-                      loadingBranch === 'ee'
-                        ? 'bg-[#D4A853] text-[#0A1628] scale-105 shadow-md shadow-[#D4A853]/20'
-                        : 'bg-[#1E3A5F] border border-[#1E3A5F]/60 text-[#F5F1E8] hover:bg-[#D4A853] hover:text-[#0A1628] hover:border-[#D4A853]'
-                    }`}
-                    style={{ transitionDelay: '80ms' }}
-                  >
-                    {loadingBranch === 'ee' && <span className="w-3 h-3 border-2 border-[#0A1628] border-t-transparent animate-spin rounded-full"></span>}
-                    EE
-                  </button>
-
-                  {/* Option 3: ECE */}
-                  <button
-                    onClick={() => handleNavigate('ECE', 'ece')}
-                    disabled={!!loadingBranch}
-                    className={`px-3.5 py-2 rounded-full text-xs font-bold transition-all duration-300 active:scale-95 flex items-center gap-1.5 ${
-                      loadingBranch === 'ece'
-                        ? 'bg-[#D4A853] text-[#0A1628] scale-105 shadow-md shadow-[#D4A853]/20'
-                        : 'bg-[#1E3A5F] border border-[#1E3A5F]/60 text-[#F5F1E8] hover:bg-[#D4A853] hover:text-[#0A1628] hover:border-[#D4A853]'
-                    }`}
-                    style={{ transitionDelay: '160ms' }}
-                  >
-                    {loadingBranch === 'ece' && <span className="w-3 h-3 border-2 border-[#0A1628] border-t-transparent animate-spin rounded-full"></span>}
-                    ECE
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {/* SIF Selection */}
-            <div 
-              className="absolute left-0 top-0 transition-all duration-300"
-              style={{
-                opacity: getOpacity(3, progress),
-                visibility: getOpacity(3, progress) > 0.05 ? 'visible' : 'hidden',
-                pointerEvents: getOpacity(3, progress) > 0.05 ? 'auto' : 'none',
-              }}
-            >
-              <button
-                onClick={() => handleNavigate('CE', 'civil')}
-                disabled={!!loadingBranch}
-                className="inline-flex items-center gap-2 text-xs font-bold text-[#0A1628] bg-[#D4A853] hover:bg-[#B8873F] px-5 py-2.5 rounded-full shadow-lg shadow-[#D4A853]/10 hover:shadow-[#D4A853]/25 transition-all duration-300 hover:-translate-y-0.5 active:scale-95 disabled:opacity-50"
-              >
-                {loadingBranch === 'civil' ? (
-                  <span className="flex items-center gap-1.5"><span className="w-3.5 h-3.5 border-2 border-[#0A1628] border-t-transparent animate-spin rounded-full"></span>Loading...</span>
-                ) : (
-                  'Select This Branch'
-                )}
-              </button>
-            </div>
-
-            {/* SMMME Selection */}
-            <div 
-              className="absolute left-0 top-0 transition-all duration-300"
-              style={{
-                opacity: getOpacity(4, progress),
-                visibility: getOpacity(4, progress) > 0.05 ? 'visible' : 'hidden',
-                pointerEvents: getOpacity(4, progress) > 0.05 ? 'auto' : 'none',
-              }}
-            >
-              <button
-                onClick={() => handleNavigate('MM', 'metallurgy')}
-                disabled={!!loadingBranch}
-                className="inline-flex items-center gap-2 text-xs font-bold text-[#0A1628] bg-[#D4A853] hover:bg-[#B8873F] px-5 py-2.5 rounded-full shadow-lg shadow-[#D4A853]/10 hover:shadow-[#D4A853]/25 transition-all duration-300 hover:-translate-y-0.5 active:scale-95 disabled:opacity-50"
-              >
-                {loadingBranch === 'metallurgy' ? (
-                  <span className="flex items-center gap-1.5"><span className="w-3.5 h-3.5 border-2 border-[#0A1628] border-t-transparent animate-spin rounded-full"></span>Loading...</span>
-                ) : (
-                  'Select This Branch'
-                )}
-              </button>
-            </div>
-          </div>
+        {/* Right CTA / Auth Pill Button */}
+        <div className="hidden md:flex items-center gap-3">
+          <Link
+            href="/select-branch"
+            className="bg-[#0A1628]/90 hover:bg-[#0A1628] text-white text-xs sm:text-sm font-semibold px-5 py-2.5 rounded-full border border-white/20 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 backdrop-blur-md"
+          >
+            Get Started &rarr;
+          </Link>
         </div>
 
-        {/* Persistent Main Content Area */}
-        <div className="flex-1 flex flex-col items-center justify-start pt-[14vh] md:pt-[18vh] px-6 max-w-4xl mx-auto text-center z-10 relative">
-          {/* Headline */}
-          <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold text-white tracking-tight leading-[1.1] mb-6 max-w-3xl drop-shadow-lg">
-            Predict Your CGPA <br className="hidden sm:inline" />
-            <span className="bg-gradient-to-r from-[#e6be6e] via-[#D4A853] to-[#e6be6e] bg-clip-text text-transparent">
-              Before It&apos;s Final
-            </span>
-          </h1>
+        {/* Mobile Burger Menu Button (3 bars -> X animation) */}
+        <button
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          className="md:hidden w-11 h-11 rounded-full bg-white/10 border border-white/20 backdrop-blur-md flex flex-col items-center justify-center gap-1.5 focus:outline-none z-50 text-white shadow-lg active:scale-95 transition-transform"
+          aria-label="Toggle navigation menu"
+        >
+          <span
+            className={`w-5 h-0.5 bg-white rounded-full transition-all duration-300 ${
+              mobileMenuOpen ? 'rotate-45 translate-y-2' : ''
+            }`}
+          />
+          <span
+            className={`w-5 h-0.5 bg-white rounded-full transition-all duration-300 ${
+              mobileMenuOpen ? 'opacity-0' : ''
+            }`}
+          />
+          <span
+            className={`w-5 h-0.5 bg-white rounded-full transition-all duration-300 ${
+              mobileMenuOpen ? '-rotate-45 -translate-y-2' : ''
+            }`}
+          />
+        </button>
+      </header>
 
-          {/* Subheadline */}
-          <p className="text-sm sm:text-base md:text-lg text-[#F5F1E8] max-w-2xl font-normal mb-10 leading-relaxed px-2 drop-shadow-md">
-            Enter your grades, get instant CGPA projections tailored to your curriculum.
-          </p>
-
-          {/* Action Buttons */}
-          <div className="flex justify-center items-center w-full max-w-xs sm:max-w-none">
+      {/* MOBILE SHEET MENU OVERLAY (≤720px) */}
+      {mobileMenuOpen && (
+        <div className="md:hidden fixed inset-0 z-40 flex flex-col justify-start pt-20 px-4 bg-black/75 backdrop-blur-xl animate-modal-scale">
+          <div className="bg-[#0A1628]/95 border border-white/20 rounded-3xl p-6 text-white shadow-2xl flex flex-col gap-6">
+            <div className="flex items-center justify-between border-b border-white/10 pb-4">
+              <span className="font-bold text-lg text-white">Menu Navigation</span>
+              <button
+                onClick={() => setMobileMenuOpen(false)}
+                className="text-[#8B94A3] hover:text-white p-1"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="flex flex-col gap-4">
+              {navLinks.map((link, idx) => (
+                <button
+                  key={link.id}
+                  onClick={() => handleNavClick(link.id, link.href)}
+                  className="flex items-center justify-between py-2 text-left text-lg font-medium border-b border-white/5 text-white/90 hover:text-[#D4A853] transition-colors"
+                  style={{ animationDelay: `${idx * 80}ms` }}
+                >
+                  <span>{link.label}</span>
+                  {activeNav === link.id && (
+                    <span className="text-xs font-mono text-[#D4A853]">Active</span>
+                  )}
+                </button>
+              ))}
+            </div>
             <Link
               href="/select-branch"
-              className="w-full sm:w-auto bg-[#D4A853] hover:bg-[#B8873F] text-[#0A1628] font-bold px-8 py-4 rounded-full shadow-lg shadow-[#D4A853]/20 hover:shadow-[#D4A853]/40 hover:-translate-y-0.5 transition-all duration-300 transform text-base focus:outline-none focus:ring-2 focus:ring-[#D4A853] focus:ring-offset-2 focus:ring-offset-[#0A1628] text-center"
+              onClick={() => setMobileMenuOpen(false)}
+              className="w-full text-center bg-[#D4A853] text-[#0A1628] font-bold py-3.5 rounded-full shadow-lg hover:bg-[#b8873f] transition-all mt-2"
             >
-              Go to Calculator
+              Get Started &rarr;
             </Link>
           </div>
         </div>
+      )}
 
-        {/* Right-aligned Vertical 5-Dot Navigation Indicator */}
-        <div className="fixed right-6 md:right-8 top-1/2 transform -translate-y-1/2 flex flex-col gap-5 z-30">
-          {BUILDINGS.map((b, idx) => {
-            const isActive = idx === activeIndex
-            return (
-              <button
-                key={b.id}
-                onClick={() => scrollToBuilding(idx)}
-                className="group relative flex items-center justify-end focus:outline-none"
-                aria-label={`Scroll to ${b.name}`}
+      {/* REGION 2: CENTERED HERO CONTENT */}
+      <main className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 z-10 relative text-center max-w-4xl mx-auto py-2">
+        {/* Trust Row: 7 Department Icons in Overlapping Rings + Pill */}
+        <div className="inline-flex items-center gap-2 sm:gap-3 bg-white/10 border border-white/20 backdrop-blur-md rounded-full px-3 sm:px-4 py-1.5 mb-6 shadow-xl animate-hero-reveal">
+          <div className="flex items-center -space-x-2">
+            {DEPARTMENTS.map((dept) => (
+              <div
+                key={dept.code}
+                title={dept.name}
+                className={`w-6 h-6 sm:w-7 sm:h-7 rounded-full ${dept.bg} text-white flex items-center justify-center text-[9px] sm:text-[10px] font-black border-2 border-[#0A1628] shadow-md hover:scale-125 hover:z-20 transition-all cursor-pointer`}
               >
-                {/* Custom Glass Tooltip on Hover */}
-                <span className="absolute right-8 bg-[#0A1628]/95 text-[#F5F1E8] text-[10px] font-mono tracking-wider uppercase px-2.5 py-1.5 rounded-lg border border-[#1E3A5F]/60 opacity-0 group-hover:opacity-100 transition-all duration-200 transform translate-x-2 group-hover:translate-x-0 pointer-events-none whitespace-nowrap shadow-xl">
-                  {b.name}
-                </span>
-                
-                {/* Visual Dot */}
-                <div 
-                  className={`w-3 h-3 rounded-full transition-all duration-300 border ${
-                    isActive 
-                      ? 'bg-[#D4A853] border-[#D4A853] scale-125 shadow-[0_0_12px_rgba(212,168,83,0.6)]' 
-                      : 'bg-[#8B94A3]/40 border-[#8B94A3]/50 hover:bg-[#8B94A3] scale-100'
-                  }`}
-                />
-              </button>
-            )
-          })}
+                {dept.code}
+              </div>
+            ))}
+          </div>
+          <span className="text-xs sm:text-sm font-semibold text-white/90 tracking-wide pr-1">
+            Trusted by IIT Bhubaneswar Students
+          </span>
         </div>
 
-        {/* Scroll indicator (fades out as user scrolls) */}
-        <div 
-          className="w-full pb-8 flex flex-col items-center justify-end z-10 relative transition-opacity duration-300"
-          style={{
-            opacity: Math.max(0, 1 - progress * 5),
-            pointerEvents: progress > 0.2 ? 'none' : 'auto',
-          }}
-        >
-          <div 
-            onClick={() => scrollToBuilding(1)}
-            className="flex flex-col items-center gap-2 cursor-pointer opacity-70 hover:opacity-100 transition-opacity duration-300 group"
+        {/* 2-Line Retro Dot-Matrix / Pixel Headline */}
+        <h1 className="font-pixel text-4xl sm:text-6xl md:text-7xl font-bold text-white tracking-tight uppercase leading-tight mb-4 drop-shadow-2xl">
+          <span className="block animate-hero-reveal animation-delay-100">
+            Track Your
+          </span>
+          <span className="block animate-hero-reveal animation-delay-200">
+            Academic Journey
+          </span>
+        </h1>
+
+        {/* Subhead */}
+        <p className="text-sm sm:text-base md:text-lg text-slate-200 max-w-2xl font-normal leading-relaxed mb-8 px-2 animate-hero-reveal animation-delay-300">
+          Calculate your SGPA and CGPA instantly across all 8 semesters, built specifically for every IIT Bhubaneswar B.Tech branch.
+        </p>
+
+        {/* CTA Button: White Pill with Glow Effect */}
+        <div className="animate-hero-reveal animation-delay-400">
+          <Link
+            href="/select-branch"
+            className="inline-flex items-center gap-2 bg-white text-[#0A1628] font-extrabold text-sm sm:text-base px-8 py-3.5 rounded-full shadow-[0_0_30px_rgba(255,255,255,0.45)] hover:shadow-[0_0_45px_rgba(255,255,255,0.7)] hover:-translate-y-0.5 active:scale-95 transition-all duration-300"
           >
-            <span className="text-[10px] font-mono tracking-widest text-[#F5F1E8] uppercase group-hover:text-[#D4A853] transition-colors">
-              Scroll to explore buildings
-            </span>
-            <svg className="w-5 h-5 text-[#D4A853] animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+            <span>Calculate Now</span>
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
             </svg>
-          </div>
+          </Link>
         </div>
-      </div>
+      </main>
+
+      {/* REGION 3: STATS FOOTER (4-Column Grid, 2x2 on Mobile, Count-Up Animation) */}
+      <footer className="w-full max-w-5xl mx-auto px-4 sm:px-6 pb-6 pt-2 z-10 relative">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+          {STATS.map((stat, idx) => (
+            <StatItem key={stat.id} stat={stat} index={idx} />
+          ))}
+        </div>
+      </footer>
     </div>
   )
 }

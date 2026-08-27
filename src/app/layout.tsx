@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { DotGothic16 } from "next/font/google";
 import VisitTracker from "@/components/VisitTracker";
 import "./globals.css";
 
@@ -12,6 +13,11 @@ const geistMono = localFont({
   src: "./fonts/GeistMonoVF.woff",
   variable: "--font-geist-mono",
   weight: "100 900",
+});
+const dotGothic = DotGothic16({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-pixel",
 });
 
 export const metadata: Metadata = {
@@ -27,7 +33,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${dotGothic.variable} antialiased`}
       >
         <VisitTracker />
         {children}
@@ -35,4 +41,5 @@ export default function RootLayout({
     </html>
   );
 }
+
 

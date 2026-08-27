@@ -139,9 +139,9 @@ The **IIT Bhubaneswar CGPA Calculator & Academic Tracker** is a client-centric w
 ### Application Routes & Pages (`src/app/`)
 
 #### [`src/app/layout.tsx`](file:///c:/Bunty/IIT%20BBS/Project/iitbbs-cgpa-calculator-1/src/app/layout.tsx)
-- **Purpose**: Root application layout component wrapping all routes with global font configurations (`GeistSans`, `GeistMono`), metadata, and mounted `<VisitTracker />`.
+- **Purpose**: Root application layout component wrapping all routes with global font configurations (`GeistSans`, `GeistMono`, and Google Font `DotGothic16`), metadata, and mounted `<VisitTracker />`.
 - **Exports/Contents**: `metadata`, default export `RootLayout`.
-- **Interacts with**: `src/app/globals.css`, `src/components/VisitTracker.tsx`, `src/app/fonts/`.
+- **Interacts with**: `src/app/globals.css`, `src/components/VisitTracker.tsx`, `src/app/fonts/`, `next/font/google`.
 
 #### [`src/app/api/track-visit/route.ts`](file:///c:/Bunty/IIT%20BBS/Project/iitbbs-cgpa-calculator-1/src/app/api/track-visit/route.ts)
 - **Purpose**: Next.js API route handling `POST` requests to record anonymous page visits in Supabase `page_visits` table.
@@ -154,8 +154,8 @@ The **IIT Bhubaneswar CGPA Calculator & Academic Tracker** is a client-centric w
 - **Interacts with**: `src/lib/supabase/server.ts`, Supabase RPC `get_visit_stats()`.
 
 #### [`src/app/globals.css`](file:///c:/Bunty/IIT%20BBS/Project/iitbbs-cgpa-calculator-1/src/app/globals.css)
-- **Purpose**: Global CSS definitions, Tailwind directives, glassmorphic UI variables, theme tokens, and custom scroll-driven animation styles.
-- **Exports/Contents**: Global CSS design system and theme classes.
+- **Purpose**: Global CSS definitions, Tailwind directives, glassmorphic UI variables, theme tokens, retro font utilities (`.font-pixel`), entrance animations (`slideDown`, `heroReveal`), and prefers-reduced-motion overrides.
+- **Exports/Contents**: Global CSS design system, animation keyframes, and theme classes.
 - **Interacts with**: `src/app/layout.tsx`, all components and pages.
 
 #### [`src/app/page.tsx`](file:///c:/Bunty/IIT%20BBS/Project/iitbbs-cgpa-calculator-1/src/app/page.tsx)
@@ -202,9 +202,9 @@ The **IIT Bhubaneswar CGPA Calculator & Academic Tracker** is a client-centric w
 ### Components (`src/components/`)
 
 #### [`src/components/LandingHero.tsx`](file:///c:/Bunty/IIT%20BBS/Project/iitbbs-cgpa-calculator-1/src/components/LandingHero.tsx)
-- **Purpose**: Scroll-driven interactive landing hero featuring mathematical cross-fading of campus building images, building action popovers, and dot navigation.
+- **Purpose**: Redesigned single-viewport (`100vh`/`100dvh`) landing hero featuring automatic crossfading campus background slideshow, circular IIT BBS monogram logo, white pill navigation with 3-dot active indicators, 7-department trust ring row, 2-line retro pixel headline ("Track Your Academic Journey"), glowing white CTA button, responsive mobile drawer menu, and animated count-up stats footer.
 - **Exports/Contents**: Export `LandingHero`.
-- **Interacts with**: `src/lib/storage.ts`, `public/Images/`, Next.js `useRouter`.
+- **Interacts with**: Next.js `useRouter`, `public/Images/`, Google Font `DotGothic16`.
 
 #### [`src/components/CurriculumDashboard.tsx`](file:///c:/Bunty/IIT%20BBS/Project/iitbbs-cgpa-calculator-1/src/components/CurriculumDashboard.tsx)
 - **Purpose**: Main 8-semester curriculum grid component displaying cumulative CGPA, semester SGPAs, progress bars, grade selectors, course action modals, and page visit analytics.
@@ -360,6 +360,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=<your-anon-key>
 ## 4. Change Log
 
 ## Change Log
+- **2026-08-27** — Redesigned landing page hero (`src/components/LandingHero.tsx`) and header into a fitted single-viewport (`100vh`/`100dvh`) layout: added automatic 5-second crossfading campus slideshow background (`public/Images/`), circular IIT BBS logo mark with hover scale, white pill nav (`Home`, `Calculator`, `Departments`, `About`) with 3-dot active indicator and 50%/75% opacity handling, 7-department trust ring row (`CSE`, `EE`, `ECE`, `ME`, `CE`, `MM`, `EP`), 2-line retro pixel headline ("Track Your Academic Journey") powered by Google Font `DotGothic16` via `next/font/google`, white pill CTA button with soft glow, responsive mobile drawer sheet menu (≤720px) with animated burger-to-X icon, animated 4-column count-up stats footer (`easeOutCubic` IntersectionObserver), shared reveal keyframes in `globals.css`, and `prefers-reduced-motion` accessibility support.
 - **2026-08-25** — Diagnosed and fixed `page_visits` tracking issue: added client-side console logging in `VisitTracker.tsx` and server-side DB error logging in `/api/track-visit/route.ts`, updated `schema.sql` RLS policy to explicitly grant `TO anon, authenticated, public WITH CHECK (true)`, and identified invalid Supabase project domain URL (`ENOTFOUND`) as root cause for empty database tables.
 - **2026-08-25** — Fixed Vercel production build failure (`npm run build` exit code 1) caused by an unused `TrendingUp` import in `CurriculumDashboard.tsx` (ESLint `@typescript-eslint/no-unused-vars` error). Added `export const dynamic = 'force-dynamic'` to `/api/track-visit` and `/api/visit-stats` routes, and safe fallback defaults for Supabase environment variables in `client.ts` and `server.ts`.
 - **2026-08-25** — Configured dual Git push remotes (`origin`) for simultaneous multi-repo synchronization to both `https://github.com/bhuvan-0412/iitbbs-cgpa-calculator.git` and `https://github.com/SusheelSagar4/iitbbs-cgpa-calculator.git`.

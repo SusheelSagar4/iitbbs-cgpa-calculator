@@ -1,43 +1,119 @@
-# IIT Bhubaneswar CGPA Calculator & Academic Tracker
+# 🎓 IIT Bhubaneswar CGPA Calculator & Academic Tracker
 
-An interactive web application for IIT Bhubaneswar B.Tech students to track, calculate, and predict SGPA and CGPA across all 8 semesters with branch-specific official curriculum data.
+An interactive, high-performance web application designed for B.Tech students at **IIT Bhubaneswar** to track, calculate, and predict SGPA and CGPA across all 8 semesters using official department curricula and grading rules.
 
-🔗 **Live Application**: [https://iitbbs-cgpa-calculator.vercel.app/](https://iitbbs-cgpa-calculator.vercel.app/)
+🔗 **Live Application**: [IIT Bhubaneswar CGPA Calculator & Academic Tracker](https://iitbbs-cgpa-calculator.vercel.app/)
 
-## Table of Contents
+---
 
-- [Features](#features)
-- [Prerequisites](#prerequisites)
-- [Installation](#installation)
-- [Usage / Quick Start](#usage--quick-start)
-- [Deployment](#deployment)
-- [Configuration](#configuration)
-- [Project Structure](#project-structure)
-- [Contributing](#contributing)
-- [License](#license)
+## 🌟 Key Features & Progress Made
 
-## Features
+- **Branch-Specific 8-Semester Curricula**: Pre-loaded official course catalogs, codes, and credit weightages for all 7 B.Tech departments:
+  - 💻 **Computer Science & Engineering (CSE)**
+  - ⚡ **Electrical Engineering (EE)**
+  - 📡 **Electronics & Communication Engineering (ECE)**
+  - ⚙️ **Mechanical Engineering (ME)**
+  - 🏗️ **Civil Engineering (CE)**
+  - 🔬 **Metallurgical & Materials Engineering (MM / MEMS)**
+  - ⚛️ **Engineering Physics (EP)**
+- **Real-Time Instant SGPA & CGPA Calculation**: Computes Semester Grade Point Average (SGPA) and Cumulative Grade Point Average (CGPA) instantaneously based on the official IIT Bhubaneswar 10-point letter grading scale:
+  - `EX`: 10 | `A`: 9 | `B`: 8 | `C`: 7 | `D`: 6 | `P`: 5 | `F`: 0
+- **Modern Single-Viewport Landing Page**: Features a 100vh hero section with automatic cross-fading campus photography (Admin, SMS, SECS, SIF, SMMME), retro pixel dot-matrix typography, and department trust badges.
+- **Animated Statistics Counter**: 4-column animated metric display tracking active branches, courses cataloged, grading accuracy, and student usage.
+- **Custom Course & Semester Management**:
+  - Add official catalog courses or user-defined custom courses with custom codes and credits.
+  - Dynamically modify course credits, letter grades, or delete individual courses and semesters.
+  - Interactive course autocomplete combobox for quick course selection.
+- **Privacy-First Local Persistence**: Student grade data is saved safely in the browser's `localStorage` (`iitbbs_academic_tracker_v1`). No login required, zero personal data collected.
+- **Anonymous Page Analytics System**: Built-in privacy-friendly visit counter integrated with Supabase RLS and custom PostgreSQL RPC procedures (`get_visit_stats`).
+- **Glassmorphic UI & Theme Engine**: VisionOS-inspired glassmorphism with instant Dark and Light mode toggling and system preference detection.
 
-- **Branch-Specific 8-Semester Curricula**: Pre-loaded course lists, codes, and credit weightages for 7 B.Tech departments:
-  - Computer Science & Engineering (CS/CSE)
-  - Electrical Engineering (EE)
-  - Electronics & Communication Engineering (ECE)
-  - Mechanical Engineering (ME)
-  - Civil Engineering (CE)
-  - Metallurgical & Materials Engineering (MM/MEMS)
-  - Engineering Physics (EP)
-- **Live SGPA & CGPA Calculation**: Calculates Semester Grade Point Average (SGPA) and Cumulative Grade Point Average (CGPA) in real time using the official IIT Bhubaneswar 10-point grading scale (`EX`: 10, `A`: 9, `B`: 8, `C`: 7, `D`: 6, `P`: 5, `F`: 0).
-- **Interactive Campus Scroll Hero**: High-resolution, scroll-driven visual overview of IIT Bhubaneswar campus schools (Admin Building, SMS, SECS, SIF, SMMME).
-- **Course & Semester Customization**: Add, edit, or remove custom courses and semesters dynamically.
-- **Local Persistence**: Saves user inputs and course data in browser `localStorage` (`iitbbs_academic_tracker_v1`).
-- **Dark & Light Mode Support**: Built-in theme provider and toggle supporting glassmorphic dark/light themes.
+---
 
-## Prerequisites
+## 🚀 Live Demo
 
-- **Node.js**: `v18.17.0` or higher (Node.js `v20.x` recommended, as declared in `@types/node`).
-- **Package Manager**: `npm` (v9+ recommended, included with Node.js).
+Access the live application directly in your browser:
+👉 **[IIT Bhubaneswar CGPA Calculator & Academic Tracker](https://iitbbs-cgpa-calculator.vercel.app/)**
 
-## Installation
+---
+
+## 🛠️ Tech Stack & Architecture
+
+- **Framework**: [Next.js 14](https://nextjs.org/) (App Router & React Server Components)
+- **Language**: [TypeScript](https://www.typescriptlang.org/)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/) with Custom Glassmorphism System
+- **Fonts**: `GeistSans`, `GeistMono`, and Google Font [`DotGothic16`](https://fonts.google.com/specimen/DotGothic16)
+- **Icons**: [Lucide React](https://lucide.dev/)
+- **Database & Analytics**: [Supabase](https://supabase.com/) (`@supabase/ssr`) with PostgreSQL Row Level Security (RLS)
+- **Hosting & CI/CD**: [Vercel](https://vercel.com/)
+
+---
+
+## 📂 Project Structure
+
+```
+iitbbs-cgpa-calculator/
+├── DATA/                   # Official syllabus source documents (.docx per department)
+│   ├── CS/                 # Computer Science & Engineering
+│   ├── EE/                 # Electrical Engineering
+│   ├── ECE/                # Electronics & Communication Engineering
+│   ├── ME/                 # Mechanical Engineering
+│   ├── Civil/              # Civil Engineering
+│   ├── MM/                 # Metallurgical & Materials Engineering
+│   └── EP/                 # Engineering Physics
+├── public/                 # Static campus imagery and visual assets
+│   └── Images/             # High-res hero slides (hero-admin, hero-[#dept], etc.)
+├── src/
+│   ├── app/                # Next.js 14 App Router routes & endpoints
+│   │   ├── api/            # Serverless API routes
+│   │   │   ├── track-visit/ # POST endpoint for recording page visits
+│   │   │   └── visit-stats/ # GET endpoint for retrieving analytics metrics
+│   │   ├── calculator/     # Branch-specific calculator route ([branch])
+│   │   ├── dashboard/      # Main tracker dashboard and semester views
+│   │   ├── select-branch/  # Department selection cards
+│   │   ├── globals.css     # Design tokens, keyframe animations, glass utilities
+│   │   ├── layout.tsx      # Global root layout with VisitTracker mounted
+│   │   └── page.tsx        # Single-viewport landing page
+│   ├── components/         # Reusable React UI components
+│   │   ├── AddCourseModal.tsx       # Modal for adding courses from catalog or custom
+│   │   ├── AddSemesterButton.tsx    # Button to append new semesters
+│   │   ├── CourseCombobox.tsx       # Searchable catalog course selector
+│   │   ├── CourseManager.tsx        # Table view for single semester course editing
+│   │   ├── CurriculumDashboard.tsx  # Main 8-semester CGPA tracker grid
+│   │   ├── DeleteSemesterButton.tsx # Semester deletion confirmation component
+│   │   ├── GradeSelector.tsx        # Interactive letter grade picker
+│   │   ├── LandingHero.tsx          # Single-viewport hero with background slideshow
+│   │   ├── Onboarding.tsx           # Initial department setup flow
+│   │   ├── ThemeProvider.tsx        # Dark/Light theme context provider
+│   │   ├── ThemeToggle.tsx          # Animated theme toggle button
+│   │   └── VisitTracker.tsx         # Client component for silent analytics tracking
+│   ├── data/               # Official branch curricula definitions
+│   │   └── coursesData.ts  # Pre-loaded course codes, titles, credits, and branches
+│   └── lib/                # Utility modules & helpers
+│       ├── curricula.ts    # Branch curriculum schemas and types
+│       ├── grading.ts      # Core SGPA & CGPA calculation logic
+│       ├── storage.ts      # LocalStorage wrapper for client-side state
+│       ├── visitStats.ts   # Helper for fetching page visit statistics
+│       └── supabase/       # Supabase client/server instantiation modules
+├── supabase/               # Database SQL migrations & schema definitions
+│   └── schema.sql          # Tables, RLS policies, and get_visit_stats RPC function
+├── .env.local              # Local environment variables configuration
+├── next.config.mjs         # Next.js framework configuration
+├── package.json            # NPM dependencies and scripts
+├── tailwind.config.ts      # Tailwind CSS configuration
+└── tsconfig.json           # TypeScript configuration
+```
+
+---
+
+## ⚡ Quick Start & Development
+
+### Prerequisites
+
+- **Node.js**: `v18.17.0` or higher (`v20.x` recommended)
+- **Package Manager**: `npm` (v9+)
+
+### Installation
 
 1. **Clone the repository**:
    ```bash
@@ -50,115 +126,53 @@ An interactive web application for IIT Bhubaneswar B.Tech students to track, cal
    npm install
    ```
 
-## Usage / Quick Start
+3. **Configure Environment Variables**:
+   Create a `.env.local` file in the root directory:
+   ```env
+   NEXT_PUBLIC_SUPABASE_URL=https://<your-supabase-project>.supabase.co
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=<your-supabase-anon-key>
+   ```
 
-### Development Server
+4. **Start the Development Server**:
+   ```bash
+   npm run dev
+   ```
+   Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-Run the development server locally:
+5. **Build for Production**:
+   ```bash
+   npm run build
+   npm run start
+   ```
 
-```bash
-npm run dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+## 🌐 Deployment
 
-### Production Build
+The application is deployed on Vercel and configured for automatic continuous deployment on commits to the `main` branch.
 
-To compile and launch the production build:
+- **Live URL**: [https://iitbbs-cgpa-calculator.vercel.app/](https://iitbbs-cgpa-calculator.vercel.app/)
 
-```bash
-npm run build
-npm run start
-```
+To deploy your own instance to Vercel:
+1. Push your repository to GitHub.
+2. Import the project into [Vercel](https://vercel.com/new).
+3. Set the environment variables (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`).
+4. Click **Deploy**.
 
-### Code Formatting & Linting
+---
 
-Run ESLint to check for code syntax or linting issues:
+## 🤝 Contributing
 
-```bash
-npm run lint
-```
-
-## Deployment
-
-The application is deployed live on Vercel:
-👉 **Live URL**: [https://iitbbs-cgpa-calculator.vercel.app/](https://iitbbs-cgpa-calculator.vercel.app/)
-
-### Deploying Your Own Instance
-
-The application can be deployed directly to [Vercel](https://vercel.com/):
-
-1. Push your code to a GitHub repository.
-2. Import the repository into the [Vercel Platform](https://vercel.com/new).
-3. Configure environment variables (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`) in the Vercel project settings if needed.
-4. Deploy.
-
-For more details on Next.js deployment, check out the official [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying).
-
-## Configuration
-
-### Environment Variables
-
-Environment variables are defined in `.env.local` for local development.
-
-| Variable | Description | Required |
-| :--- | :--- | :--- |
-| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL (`https://<project-ref>.supabase.co`) | Required for Visit Tracking |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase public anonymous API key | Required for Visit Tracking |
-
-> **Note**: User academic data (semesters & course grades) is saved locally in browser `localStorage` (`src/lib/storage.ts`). Supabase is used for privacy-friendly, anonymous page-visit counter analytics (`page_visits` table & `get_visit_stats` RPC function).
-
-### Database Setup (Supabase)
-
-If setting up the Supabase database schema manually:
-1. Run the SQL statements in [`supabase/schema.sql`](file:///c:/Bunty/IIT%20BBS/Project/iitbbs-cgpa-calculator-1/supabase/schema.sql) in your Supabase SQL Editor.
-2. The schema creates `semesters`, `courses`, and `page_visits` tables with Row Level Security (RLS) policies and the `get_visit_stats()` RPC function.
-
-
-## Project Structure
-
-```
-iitbbs-cgpa-calculator/
-├── DATA/                   # Raw syllabus DOCX files per department
-├── public/                 # Static assets and images
-├── src/
-│   ├── app/                # Next.js App Router pages and layouts
-│   │   ├── calculator/     # Branch-specific calculator route ([branch])
-│   │   ├── dashboard/      # Semester dashboard pages
-│   │   ├── select-branch/  # Department selection page
-│   │   ├── globals.css     # Global styles and design system variables
-│   │   ├── layout.tsx      # Root layout
-│   │   └── page.tsx        # Landing page with hero animation
-│   ├── components/         # React UI components
-│   │   ├── AddCourseModal.tsx
-│   │   ├── CourseManager.tsx
-│   │   ├── CurriculumDashboard.tsx
-│   │   ├── LandingHero.tsx
-│   │   └── ThemeToggle.tsx
-│   ├── data/               # Official curriculum definitions (coursesData.ts)
-│   └── lib/                # Utility modules
-│       ├── curricula.ts    # Fallback/branch curriculum schemas
-│       ├── grading.ts      # SGPA & CGPA calculation logic
-│       ├── storage.ts      # LocalStorage persistence logic
-│       └── supabase/       # Supabase client and server setup
-├── supabase/               # Database SQL schema (schema.sql)
-├── .env.local              # Local environment configuration
-├── next.config.mjs         # Next.js configuration
-├── package.json            # Dependencies and scripts
-├── tailwind.config.ts      # Tailwind CSS configuration
-└── tsconfig.json           # TypeScript configuration
-```
-
-## Contributing
-
-Contributions, bug reports, and curriculum data updates are welcome!
+Contributions, feature suggestions, and curriculum data updates are welcome!
 
 1. Fork the repository.
-2. Create your feature branch (`git checkout -b feature/amazing-feature`).
-3. Commit your changes (`git commit -m 'Add amazing feature'`).
+2. Create a feature branch (`git checkout -b feature/amazing-feature`).
+3. Commit your changes (`git commit -m 'feat: Add amazing feature'`).
 4. Push to the branch (`git push origin feature/amazing-feature`).
 5. Open a Pull Request.
 
-## License
+---
 
-This project does not currently specify an open-source license file. All rights reserved by the author unless stated otherwise.
+## 📄 License
+
+All rights reserved by the author unless stated otherwise.
