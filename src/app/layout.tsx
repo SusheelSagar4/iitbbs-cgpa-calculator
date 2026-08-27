@@ -1,14 +1,8 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import { Inter, DotGothic16 } from "next/font/google";
+import { DotGothic16 } from "next/font/google";
 import VisitTracker from "@/components/VisitTracker";
 import "./globals.css";
-
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-  weight: ["400", "500", "600", "700"],
-});
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -39,7 +33,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${inter.variable} ${geistSans.variable} ${geistMono.variable} ${dotGothic.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${dotGothic.variable} antialiased`}
       >
         <VisitTracker />
         {children}
